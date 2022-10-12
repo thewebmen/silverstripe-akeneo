@@ -1,0 +1,23 @@
+{
+  "name": "wedevelop/silverstripe-akeneo",
+  "description": "akeneo module for silverstripe",
+  "keywords": [
+    "akeneo",
+    "pim"
+  ],
+  "type": "silverstripe-vendormodule",
+  "require": {
+    "php": "^8.0",
+    "silverstripe/framework": "^4.11",
+    "silverstripe/cms": "^4.11",
+    "symbiote/silverstripe-gridfieldextensions": "^3.4"
+  },
+  "extra": {
+    "installer-name": "silverstripe-akeneo"
+  },
+  "autoload": {
+    "psr-4": {
+      "WeDevelop\\Akeneo\\": "src/"
+    }
+  }
+}

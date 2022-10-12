@@ -1,0 +1,16 @@
+---
+Name: akeneo
+---
+Silverstripe\SiteConfig\SiteConfig:
+  extensions:
+    - WeDevelop\Akeneo\Extensions\AkeneoSiteConfigExtension
+SilverStripe\CMS\Model\SiteTree:
+  extensions:
+    - WeDevelop\Akeneo\Extensions\AkeneoSiteTreeExtension
+  excluded_root_pages:
+    - WeDevelop\Akeneo\Pages\ProductPage
+SilverStripe\Core\Injector\Injector:
+  AkeneoImport:
+    class: WeDevelop\Akeneo\Imports\AkeneoImport
+
+
