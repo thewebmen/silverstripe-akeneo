@@ -17,6 +17,7 @@ class AkeneoApi
     private string $secret;
     private string $username;
     private string $password;
+    private string $channel;
 
     private Client $apiClient;
     private Client $tokenClient;
@@ -31,6 +32,7 @@ class AkeneoApi
         $this->secret = $siteConfig->AkeneoSecret;
         $this->username = $siteConfig->AkeneoUsername;
         $this->password = $siteConfig->AkeneoPassword;
+        $this->channel = $siteConfig->AkeneoChannel;
         $this->tokenClient = new Client(['base_uri' => $this->host.'/'.self::TOKEN_URI]);
         $this->apiClient = new Client(['base_uri' => $this->host.'/'.self::URI]);
     }
@@ -112,6 +114,10 @@ class AkeneoApi
             'with_attribute_options' => 'true',
         ];
 
+        if ($this->channel) {
+            $query['scope'] = $this->channel;
+        }
+
         return $this->request('product-models', ['query' => $query]);
     }
 
@@ -121,6 +127,10 @@ class AkeneoApi
             'page' => $page,
             'limit' => $limit,
         ];
+
+        if ($this->channel) {
+            $query['scope'] = $this->channel;
+        }
 
         return $this->request('products', ['query' => $query]);
     }
@@ -143,6 +153,11 @@ class AkeneoApi
     public function downloadMediaFile(string $code): ?string
     {
         return $this->request(sprintf('media-files/%s/download', $code), withCount: false);
+    }
+
+    public function getChannels()
+    {
+        return $this->request('channels');
     }
 
     /**
