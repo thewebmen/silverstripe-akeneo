@@ -155,7 +155,7 @@ class AkeneoApi
         return $this->request(sprintf('media-files/%s/download', $code), withCount: false);
     }
 
-    public function getChannels()
+    public function getChannels(): array
     {
         return $this->request('channels');
     }
