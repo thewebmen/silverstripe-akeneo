@@ -33,8 +33,8 @@ class AkeneoApi
         $this->username = $siteConfig->AkeneoUsername;
         $this->password = $siteConfig->AkeneoPassword;
         $this->channel = $siteConfig->AkeneoChannel;
-        $this->tokenClient = new Client(['base_uri' => $this->host.'/'.self::TOKEN_URI]);
-        $this->apiClient = new Client(['base_uri' => $this->host.'/'.self::URI]);
+        $this->tokenClient = new Client(['base_uri' => $this->host . '/' . self::TOKEN_URI]);
+        $this->apiClient = new Client(['base_uri' => $this->host . '/' . self::URI]);
     }
 
     public function authorize(): void
@@ -171,7 +171,7 @@ class AkeneoApi
             $this->authorize();
         }
 
-        $options['headers']['Authorization'] = 'Bearer '.$this->token->getAccessToken();
+        $options['headers']['Authorization'] = 'Bearer ' . $this->token->getAccessToken();
         if ($withCount) {
             $options['query']['with_count'] = 'true';
         }

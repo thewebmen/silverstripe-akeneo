@@ -9,12 +9,11 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridField;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use WeDevelop\Akeneo\Imports\AkeneoImport;
-use WeDevelop\Akeneo\Models\ProductAttribute;
-use WeDevelop\Akeneo\Models\ProductCategory;
 use WeDevelop\Akeneo\Models\Family;
 use WeDevelop\Akeneo\Models\Product;
+use WeDevelop\Akeneo\Models\ProductAttribute;
+use WeDevelop\Akeneo\Models\ProductCategory;
 use WeDevelop\Akeneo\Models\ProductModel;
-use WeDevelop\Akeneo\Pages\ProductPage;
 
 class AkeneoAdmin extends ModelAdmin
 {

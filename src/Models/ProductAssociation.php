@@ -2,11 +2,8 @@
 
 namespace WeDevelop\Akeneo\Models;
 
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use WeDevelop\Akeneo\Pages\ProductPage;
 
 class ProductAssociation extends DataObject
 {

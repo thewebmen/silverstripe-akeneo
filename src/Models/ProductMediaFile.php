@@ -30,7 +30,7 @@ class ProductMediaFile extends DataObject
 
     public static function createFromAkeneoData(array $data, string $content): self
     {
-        $productMediaFile =  new self();
+        $productMediaFile = new self();
 
         $file = self::createFile($data, $content);
 
@@ -53,7 +53,7 @@ class ProductMediaFile extends DataObject
         }
 
         if ($this->ImageID) {
-            return DBField::create_field('HTMLText', '<img src="'.$this->Image->PreviewLink().'"/>');
+            return DBField::create_field('HTMLText', '<img src="' . $this->Image->PreviewLink() . '"/>');
         }
 
         return DBField::create_field('Text', '');
@@ -61,7 +61,7 @@ class ProductMediaFile extends DataObject
 
     public static function getFolderID(string $type): int
     {
-        return Folder::find_or_make('Product/'.$type)->ID;
+        return Folder::find_or_make('Product/' . $type)->ID;
     }
 
     private static function createFile(array $data, string $content): File

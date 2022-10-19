@@ -92,7 +92,7 @@ class ProductAttributeOption extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->Name. '('.$this->Attribute->Code.'}';
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->Name . '(' . $this->Attribute->Code . '}';
     }
 
     public static function getParentRelation(): string

@@ -4,7 +4,6 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use WeDevelop\Akeneo\Models\ProductAttribute;
 
 class Family extends DataObject implements AkeneoImportInterface
 {
@@ -99,7 +98,7 @@ class Family extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->Name;
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->Name;
     }
 
     public static function getIdentifierField(): string

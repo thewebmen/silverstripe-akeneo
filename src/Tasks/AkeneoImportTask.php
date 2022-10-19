@@ -2,13 +2,12 @@
 
 namespace WeDevelop\Akeneo\Tasks;
 
-use GuzzleHttp\Client;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use WeDevelop\Akeneo\Imports\AkeneoImport;
-use WeDevelop\Akeneo\Service\AkeneoApi;
 
-class AkeneoImportTask extends BuildTask {
+class AkeneoImportTask extends BuildTask
+{
 
     /** @config */
     protected $title = 'Akeneo import';
@@ -18,7 +17,7 @@ class AkeneoImportTask extends BuildTask {
 
     /** @config */
     protected $description = 'Imports Akeneo Categoris, Attributes, Family and Products';
-    
+
     public function run($request)
     {
         /** @var  AkeneoImport $import */

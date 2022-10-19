@@ -92,7 +92,7 @@ class ProductCategory extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->Name.'('.$this->Parent->Name.')';
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->Name . '(' . $this->Parent->Name . ')';
     }
 
     public static function getIdentifierField(): string

@@ -10,7 +10,7 @@ class Token
 {
     public function __construct(
         private string $accessToken,
-        private int $expiresIn,
+        private int    $expiresIn,
         private string $refreshToken
     ) {
 

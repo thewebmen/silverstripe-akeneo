@@ -3,8 +3,6 @@
 namespace WeDevelop\Akeneo\Extensions;
 
 use GuzzleHttp\Exception\ClientException;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;

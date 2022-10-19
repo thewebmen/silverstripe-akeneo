@@ -5,7 +5,6 @@ namespace WeDevelop\Akeneo\Models;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
@@ -62,7 +61,7 @@ class ProductAttributeValue extends DataObject
                 return implode(', ', $attribute->Options()->filter('Code', json_decode($value))->column('Name'));
             case self::PIM_CATALOG_PRICE_COLLECTION:
                 $price = json_decode($value, true);
-                return $price[0]['currency'].' '.$price[0]['amount'];
+                return $price[0]['currency'] . ' ' . $price[0]['amount'];
             case self::PIM_CATALOG_FILE_TYPE:
             case self::PIM_CATALOG_IMAGE_TYPE:
                 $productMediaFile = ProductMediaFile::get()->find('Code', $value);
