@@ -4,7 +4,6 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use WeDevelop\Akeneo\Models\ProductAttribute;
 
 class FamilyVariant extends DataObject implements AkeneoImportInterface
 {
@@ -72,7 +71,7 @@ class FamilyVariant extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->Name;
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->Name;
     }
 
     public static function getParentRelation(): string

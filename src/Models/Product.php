@@ -2,15 +2,10 @@
 
 namespace WeDevelop\Akeneo\Models;
 
-use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use WeDevelop\Akeneo\Models\ProductAssociation;
-use WeDevelop\Akeneo\Models\ProductAttributeValue;
-use WeDevelop\Akeneo\Models\ProductCategory;
 use WeDevelop\Akeneo\Pages\ProductPage;
 
 /**
@@ -44,7 +39,7 @@ class Product extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $has_many = [
         'AttributeValues' => ProductAttributeValue::class,
-        'Associations' => ProductAssociation::class.'.Product',
+        'Associations' => ProductAssociation::class . '.Product',
     ];
 
     /** @config */
@@ -125,7 +120,7 @@ class Product extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->SKU;
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->SKU;
     }
 
     public static function getIdentifierField(): string

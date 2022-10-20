@@ -3,13 +3,8 @@
 namespace WeDevelop\Akeneo\Pages;
 
 use SilverStripe\Control\Director;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Security\Member;
 use WeDevelop\Akeneo\Models\Product;
-use WeDevelop\Akeneo\Models\ProductAssociation;
-use WeDevelop\Akeneo\Models\ProductAttributeValue;
-use WeDevelop\Akeneo\Models\ProductCategory;
 
 class ProductPage extends \Page
 {
@@ -48,7 +43,7 @@ class ProductPage extends \Page
 
     /**
      * @param Member $member
-     * 
+     *
      * @return bool
      */
     public function canPublish($member = null)

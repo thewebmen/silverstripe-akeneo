@@ -2,8 +2,6 @@
 
 namespace WeDevelop\Akeneo\Imports;
 
-use SilverStripe\Assets\File;
-use SilverStripe\Assets\Folder;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\i18n\i18n;
@@ -27,31 +25,31 @@ class AkeneoImport
     use Injectable;
     use Configurable;
 
-    /** @var array<string,ProductCategory>  */
+    /** @var array<string,ProductCategory> */
     private array $categories = [];
 
-    /** @var array<string,ProductAttribute>  */
+    /** @var array<string,ProductAttribute> */
     private array $attributes = [];
 
-    /** @var array<string,ProductAttributeGroup>  */
+    /** @var array<string,ProductAttributeGroup> */
     private array $attributeGroups = [];
 
-    /** @var array<string,ProductAttributeOption>  */
+    /** @var array<string,ProductAttributeOption> */
     private array $attributesOptions = [];
 
-    /** @var array<string,Family>  */
+    /** @var array<string,Family> */
     private array $families = [];
 
-    /** @var array<string,FamilyVariant>  */
+    /** @var array<string,FamilyVariant> */
     private array $variants = [];
 
-    /** @var array<string,ProductModel>  */
+    /** @var array<string,ProductModel> */
     private array $productModels = [];
 
-    /** @var array<string,Product>  */
+    /** @var array<string,Product> */
     private array $products = [];
 
-    /** @var array<string,ProductMediaFile>  */
+    /** @var array<string,ProductMediaFile> */
     private array $productMediaFiles = [];
 
     private array $productModelsAssociations = [];
@@ -170,7 +168,7 @@ class AkeneoImport
 
         do {
             $page++;
-            $apiMethod = 'get'.ucfirst($type);
+            $apiMethod = 'get' . ucfirst($type);
 
             $akeneoData = $this->akeneoApi->$apiMethod($page, $limit, $parentImportKey);
             $itemsCount = $akeneoData['items_count'];
@@ -198,10 +196,10 @@ class AkeneoImport
 
                 $record->populateAkeneoData($akeneoItem, $locale, $relatedObjectIds);
 
-                if (in_array($type, ['products', 'productModels'])){
+                if (in_array($type, ['products', 'productModels'])) {
                     $this->setProductAttributes($record, $akeneoItem['values'], $locale);
 
-                    $associationProperty = $type.'Associations';
+                    $associationProperty = $type . 'Associations';
                     // remember relations to fill them when import of all product(models) is done
                     $this->{$associationProperty}[$record->{$class::getIdentifierField()}] = $akeneoItem['associations'];
                 }
@@ -310,7 +308,7 @@ class AkeneoImport
     protected function prepareImportWithParent(string $type, string $class, string $parentImportKey = null): void
     {
         $this->{$type}[$parentImportKey] = [];
-        $filterField = $class::getParentRelation().'.Code';
+        $filterField = $class::getParentRelation() . '.Code';
 
         foreach ($class::get()->filter([
             $filterField => $parentImportKey,
@@ -402,7 +400,7 @@ class AkeneoImport
 
             foreach ($mediaFiles['_embedded']['items'] as $mediaFile) {
                 if (array_key_exists($mediaFile['code'], $this->productMediaFiles)) {
-                    $this->output("Media file: ".$mediaFile['code']." - ".$mediaFile['original_filename']." already exists");
+                    $this->output("Media file: " . $mediaFile['code'] . " - " . $mediaFile['original_filename'] . " already exists");
                     unset($this->productMediaFiles[$mediaFile['code']]);
                     continue;
                 }
@@ -428,13 +426,13 @@ class AkeneoImport
      */
     protected function saveMediaFile(array $akeneoMediaFile): void
     {
-        $this->output("Media file: ".$akeneoMediaFile['code']." - ".$akeneoMediaFile['original_filename']);
+        $this->output("Media file: " . $akeneoMediaFile['code'] . " - " . $akeneoMediaFile['original_filename']);
 
         $fileContent = $this->akeneoApi->downloadMediaFile($akeneoMediaFile['code']);
 
         $file = ProductMediaFile::createFromAkeneoData($akeneoMediaFile, $fileContent);
 
-        $this->output($file->Filename ." created ");
+        $this->output($file->Filename . " created ");
     }
 
     protected function deleteNotUpdated(string $import, string $identifierField, ?string $parentCode = null): void
@@ -446,13 +444,13 @@ class AkeneoImport
                 continue;
             }
 
-            $this->output($record->singular_name()." deleted: ".$record->{$identifierField});
+            $this->output($record->singular_name() . " deleted: " . $record->{$identifierField});
             $record->delete();
         }
     }
 
     protected function output($message)
     {
-        echo date('d-m-Y H:i:s').' : ' . $message . "\n";
+        echo date('d-m-Y H:i:s') . ' : ' . $message . "\n";
     }
 }

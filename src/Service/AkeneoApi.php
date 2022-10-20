@@ -17,6 +17,7 @@ class AkeneoApi
     private string $secret;
     private string $username;
     private string $password;
+    private string $channel;
 
     private Client $apiClient;
     private Client $tokenClient;
@@ -31,8 +32,9 @@ class AkeneoApi
         $this->secret = $siteConfig->AkeneoSecret;
         $this->username = $siteConfig->AkeneoUsername;
         $this->password = $siteConfig->AkeneoPassword;
-        $this->tokenClient = new Client(['base_uri' => $this->host.'/'.self::TOKEN_URI]);
-        $this->apiClient = new Client(['base_uri' => $this->host.'/'.self::URI]);
+        $this->channel = $siteConfig->AkeneoChannel;
+        $this->tokenClient = new Client(['base_uri' => $this->host . '/' . self::TOKEN_URI]);
+        $this->apiClient = new Client(['base_uri' => $this->host . '/' . self::URI]);
     }
 
     public function authorize(): void
@@ -112,6 +114,10 @@ class AkeneoApi
             'with_attribute_options' => 'true',
         ];
 
+        if ($this->channel) {
+            $query['scope'] = $this->channel;
+        }
+
         return $this->request('product-models', ['query' => $query]);
     }
 
@@ -121,6 +127,10 @@ class AkeneoApi
             'page' => $page,
             'limit' => $limit,
         ];
+
+        if ($this->channel) {
+            $query['scope'] = $this->channel;
+        }
 
         return $this->request('products', ['query' => $query]);
     }
@@ -145,6 +155,11 @@ class AkeneoApi
         return $this->request(sprintf('media-files/%s/download', $code), withCount: false);
     }
 
+    public function getChannels(): array
+    {
+        return $this->request('channels');
+    }
+
     /**
      * @param array<string, mixed> $options
      *
@@ -156,7 +171,7 @@ class AkeneoApi
             $this->authorize();
         }
 
-        $options['headers']['Authorization'] = 'Bearer '.$this->token->getAccessToken();
+        $options['headers']['Authorization'] = 'Bearer ' . $this->token->getAccessToken();
         if ($withCount) {
             $options['query']['with_count'] = 'true';
         }

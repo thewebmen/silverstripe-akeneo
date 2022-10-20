@@ -101,7 +101,7 @@ class ProductAttributeGroup extends DataObject implements AkeneoImportInterface
 
     public function getImportOutput(): string
     {
-        return $this->singular_name().': '.$this->ID.' - '.$this->Name;
+        return $this->singular_name() . ': ' . $this->ID . ' - ' . $this->Name;
     }
 
     public static function getIdentifierField(): string
