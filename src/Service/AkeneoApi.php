@@ -17,7 +17,7 @@ class AkeneoApi
     private string $secret;
     private string $username;
     private string $password;
-    private string $channel;
+    private ?string $channel;
 
     private Client $apiClient;
     private Client $tokenClient;

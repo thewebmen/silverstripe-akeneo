@@ -2,10 +2,9 @@
 
 namespace WeDevelop\Akeneo\Models;
 
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
-class ProductAttributeOption extends DataObject implements AkeneoImportInterface
+class ProductAttributeOption extends AbstractAkeneoTranslateable implements AkeneoImportInterface
 {
     /** @config */
     private static string $table_name = 'Akeneo_ProductAttributeOption';
@@ -19,7 +18,6 @@ class ProductAttributeOption extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $db = [
         'Code' => 'Varchar(255)',
-        'Name' => 'Varchar(255)',
         'Sort' => 'Int',
         'Updated' => 'Boolean',
     ];
@@ -27,6 +25,11 @@ class ProductAttributeOption extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $has_one = [
         'Attribute' => ProductAttribute::class,
+    ];
+
+    /** @config */
+    private static array $has_many = [
+        'LabelTranslations' => LabelTranslation::class
     ];
 
     /** @config */
@@ -79,15 +82,17 @@ class ProductAttributeOption extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds): void
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds): void
     {
         $this->Code = $akeneoItem['code'];
         $this->Sort = $akeneoItem['sort_order'];
-        $this->Name = $akeneoItem['labels'][$locale] ?? $akeneoItem['code'];
         $this->Updated = true;
+
         foreach ($relatedObjectIds as $field => $value) {
             $this->{$field} = $value;
         }
+
+        $this->updateLabels($akeneoItem);
     }
 
     public function getImportOutput(): string

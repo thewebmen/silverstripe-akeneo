@@ -9,6 +9,9 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 
+/**
+ * @method ProductAttribute Attribute()
+ */
 class ProductAttributeValue extends DataObject
 {
     public const PIM_CATALOG_DATE = 'pim_catalog_date';
@@ -39,6 +42,7 @@ class ProductAttributeValue extends DataObject
         'ProductModel' => ProductModel::class,
         'Product' => Product::class,
         'Attribute' => ProductAttribute::class,
+        'Locale' => Locale::class
     ];
 
     /** @config */
@@ -48,27 +52,34 @@ class ProductAttributeValue extends DataObject
         'Attribute.Type' => 'Type',
     ];
 
+    /** @config */
+    private static array $indexes = [
+        'LocaleID' => true,
+    ];
+
     public function getValue()
     {
         $value = $this->getField('Value');
-        $textvalue = $this->getField('TextValue');
         $attribute = $this->Attribute();
 
         switch ($attribute->Type) {
             case self::PIM_CATALOG_SIMPLESELECT_TYPE:
                 return $attribute->Options()->filter('Code', $value)->first()->Name;
             case self::PIM_CATALOG_MULTISELECT_TYPE:
-                return implode(', ', $attribute->Options()->filter('Code', json_decode($value))->column('Name'));
+                $values = json_decode($value);
+                $attributeNames = array_map(static function(ProductAttributeOption $option) {
+                    return $option->getName();
+                }, $attribute->Options()->filter('Code', $values)->toArray());
+
+                return implode(', ', $attributeNames);
             case self::PIM_CATALOG_PRICE_COLLECTION:
                 $price = json_decode($value, true);
                 return $price[0]['currency'] . ' ' . $price[0]['amount'];
             case self::PIM_CATALOG_FILE_TYPE:
             case self::PIM_CATALOG_IMAGE_TYPE:
-                $productMediaFile = ProductMediaFile::get()->find('Code', $value);
-                return $productMediaFile?->getAttributeValue();
+                return ProductMediaFile::get()->find('Code', $value)?->getAttributeValue();
             case self::PIM_CATALOG_DATE:
-                $date = DBDatetime::create()->setValue($value);
-                return $date->Nice();
+                return DBDatetime::create()->setValue($value)->Nice();
             case self::PIM_CATALOG_TEXTAREA_TYPE:
                 return DBField::create_field('HTMLText', $this->getField('TextValue'));
             default:
@@ -84,10 +95,10 @@ class ProductAttributeValue extends DataObject
 
         if ($attribute->Type === self::PIM_CATALOG_FILE_TYPE) {
             $file = File::get()->byID($this->Value);
-            $file->delete();
+            $file?->delete();
         } elseif ($attribute->Type === self::PIM_CATALOG_IMAGE_TYPE) {
             $image = Image::get()->byID($this->Value);
-            $image->delete();
+            $image?->delete();
         }
     }
 

@@ -2,10 +2,9 @@
 
 namespace WeDevelop\Akeneo\Models;
 
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
-class FamilyVariant extends DataObject implements AkeneoImportInterface
+class FamilyVariant extends AbstractAkeneoTranslateable implements AkeneoImportInterface
 {
     /** @config */
     private static string $table_name = 'Akeneo_FamilyVariant';
@@ -19,7 +18,6 @@ class FamilyVariant extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $db = [
         'Code' => 'Varchar(255)',
-        'Name' => 'Varchar(255)',
         'Updated' => 'Boolean',
     ];
 
@@ -28,15 +26,21 @@ class FamilyVariant extends DataObject implements AkeneoImportInterface
         'Family' => Family::class,
     ];
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds = []): void
+    /** @config */
+    private static array $has_many = [
+        'LabelTranslations' => LabelTranslation::class
+    ];
+
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds = []): void
     {
         $this->Code = $akeneoItem['code'];
-        $this->Name = $akeneoItem['labels'][$locale] ?? $akeneoItem['code'];
         $this->Updated = true;
 
         foreach ($relatedObjectIds as $field => $value) {
             $this->{$field} = $value;
         }
+
+        $this->updateLabels($akeneoItem);
     }
 
     /**

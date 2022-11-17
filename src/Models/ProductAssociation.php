@@ -2,10 +2,9 @@
 
 namespace WeDevelop\Akeneo\Models;
 
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
-class ProductAssociation extends DataObject
+class ProductAssociation extends AbstractAkeneoTranslateable
 {
     /** @config */
     private static string $table_name = 'Akeneo_ProductAssociation';
@@ -27,6 +26,11 @@ class ProductAssociation extends DataObject
         'ProductModel' => ProductModel::class,
         'RelatedProduct' => Product::class,
         'RelatedProductModel' => ProductModel::class,
+    ];
+
+    /** @config */
+    private static array $has_many = [
+        'LabelTranslations' => LabelTranslation::class
     ];
 
     /** @config */

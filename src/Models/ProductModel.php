@@ -34,7 +34,7 @@ class ProductModel extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $has_many = [
         'AttributeValues' => ProductAttributeValue::class,
-        'Associations' => ProductAssociation::class . '.ProductModel',
+        'Associations' => ProductAssociation::class . '.ProductModel'
     ];
 
     /** @config */
@@ -84,9 +84,9 @@ class ProductModel extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds = []): void
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds = []): void
     {
-        $this->Code = $akeneoItem['code'];;
+        $this->Code = $akeneoItem['code'];
         $this->Updated = true;
 
         foreach ($relatedObjectIds as $field => $value) {

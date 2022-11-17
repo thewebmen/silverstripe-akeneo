@@ -5,12 +5,13 @@ namespace WeDevelop\Akeneo\Models;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use WeDevelop\Akeneo\Pages\ProductPage;
 
 /**
- * @method AttributeValues()
- * @method Associations()
+ * @method HasManyList<ProductAttributeValue> AttributeValues()
+ * @method HasManyList<ProductAssociation> Associations()
  */
 class Product extends DataObject implements AkeneoImportInterface
 {
@@ -54,8 +55,9 @@ class Product extends DataObject implements AkeneoImportInterface
 
     /** @config */
     private static array $summary_fields = [
-        'ID',
         'SKU',
+        'Family.Code' => 'Family',
+        'LabelFromAttribute' => 'Label'
     ];
 
     public function getCMSFields()
@@ -103,7 +105,7 @@ class Product extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoProduct, string $locale, array $relatedObjectIds = []): void
+    public function populateAkeneoData(array $akeneoProduct, array $relatedObjectIds = []): void
     {
         $this->SKU = $akeneoProduct['identifier'];
         $this->Enabled = $akeneoProduct['enabled'];
@@ -126,5 +128,12 @@ class Product extends DataObject implements AkeneoImportInterface
     public static function getIdentifierField(): string
     {
         return 'SKU';
+    }
+
+    public function getLabelFromAttribute(): string
+    {
+        $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
+
+        return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
     }
 }

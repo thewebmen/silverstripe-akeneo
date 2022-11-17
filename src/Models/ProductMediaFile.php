@@ -19,13 +19,16 @@ class ProductMediaFile extends DataObject
     /** @config */
     private static string $plural_name = 'Product Media Files';
 
+    /** @config */
     private static $db = [
         'Code' => 'Varchar(255)',
     ];
 
+    /** @config */
     private static $has_one = [
         'Document' => File::class,
-        'Image' => Image::class
+        'Image' => Image::class,
+        'Locale' => Locale::class
     ];
 
     public static function createFromAkeneoData(array $data, string $content): self
@@ -41,6 +44,16 @@ class ProductMediaFile extends DataObject
         }
 
         $productMediaFile->Code = $data['code'];
+
+        if (array_key_exists('labels', $data)) {
+            foreach (array_keys($data['labels']) as $locale) {
+                $label = $productMediaFile->LabelTranslations()->find('Locale.Code', $locale) ?? new LabelTranslation();
+                $label->Label = $data['labels'][$locale];
+                $productMediaFile->LabelTranslations()->add($label);
+            }
+
+        }
+
         $productMediaFile->write();
 
         return $productMediaFile;
