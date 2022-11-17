@@ -318,7 +318,6 @@ class AkeneoImport
 
     protected function setProductAttributes(AkeneoImportInterface $productInstance, array $attributeValues): void
     {
-        var_dump($attributeValues);die;
         foreach ($attributeValues as $attributeCode => $values) {
             $attribute = ProductAttribute::get()->find('Code', $attributeCode);
             if (!$attribute) {
@@ -332,7 +331,7 @@ class AkeneoImport
 
                 $attributeValue = $productInstance->AttributeValues()->filter([
                     'AttributeID' => $attribute->ID,
-                    'LocaleID' => $locale?->ID,
+                    'LocaleID' => $locale->ID ?? 0,
                 ])->first();
 
                 $attributeValue = $attributeValue ?: new ProductAttributeValue();
