@@ -187,7 +187,7 @@ class Product extends DataObject implements AkeneoImportInterface
     {
         /** @var ProductAttributeValue|null $attributeValue */
         $attributeValue = $this->AttributeValues()->filter([
-            'Code' => $code,
+            'Attribute.Code' => $code,
             'Locale.Code' => $locale
         ])->first();
 
