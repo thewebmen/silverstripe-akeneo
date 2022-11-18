@@ -4,10 +4,9 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
-class ProductAttributeGroup extends DataObject implements AkeneoImportInterface
+class ProductAttributeGroup extends AbstractAkeneoTranslateable implements AkeneoImportInterface
 {
     /** @config */
     private static string $table_name = 'Akeneo_ProductAttributeGroup';
@@ -88,15 +87,17 @@ class ProductAttributeGroup extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds): void
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds): void
     {
         $this->Code = $akeneoItem['code'];
         $this->Updated = true;
         $this->Sort = $akeneoItem['sort_order'];
-        $this->Name = $akeneoItem['labels'][$locale] ?? $akeneoItem['code'];
+
         foreach ($relatedObjectIds as $field => $value) {
             $this->{$field} = $value;
         }
+
+        $this->updateLabels($akeneoItem);
     }
 
     public function getImportOutput(): string

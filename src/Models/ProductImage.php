@@ -16,8 +16,14 @@ class ProductImage extends Image
     /** @config */
     private static string $plural_name = 'Product Images';
 
-    private static $db = [
+    /** @config */
+    private static array $db = [
         'Code' => 'Varchar(255)',
+    ];
+
+    /** @config */
+    private static array $has_one = [
+        'Locale' => Locale::class
     ];
 
     public static function createFromAkeneoData(array $data, string $content): self
@@ -32,6 +38,7 @@ class ProductImage extends Image
         $productImage->Size = $data['size'];
 
         $productImage->write();
+
         if ($productImage->canPublish()) {
             $productImage->publishSingle();
         }

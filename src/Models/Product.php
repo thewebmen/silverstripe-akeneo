@@ -2,15 +2,19 @@
 
 namespace WeDevelop\Akeneo\Models;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
+use SilverStripe\i18n\i18n;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use WeDevelop\Akeneo\Pages\ProductPage;
 
 /**
- * @method AttributeValues()
- * @method Associations()
+ * @method HasManyList<ProductAttributeValue> AttributeValues()
+ * @method HasManyList<ProductAssociation> Associations()
  */
 class Product extends DataObject implements AkeneoImportInterface
 {
@@ -54,12 +58,38 @@ class Product extends DataObject implements AkeneoImportInterface
 
     /** @config */
     private static array $summary_fields = [
-        'ID',
         'SKU',
+        'Family.Name' => 'Family',
+        'LabelFromAttribute' => 'Label'
     ];
+
+    /** @config */
+    private static array $searchable_fields = [
+        'ID',
+        'SKU'
+    ];
+
+    public function getLocaleFromRequest(): string
+    {
+        $controller = Controller::curr();
+
+        if (!$controller) {
+            return i18n::get_locale();
+        }
+
+        $request = $controller->getRequest();
+
+        if (!$request) {
+            return i18n::get_locale();
+        }
+
+        return $request->getVar('locale') ?? i18n::get_locale();
+    }
 
     public function getCMSFields()
     {
+        $locale = $this->getLocaleFromRequest();
+
         $fields = parent::getCMSFields();
 
         $fields->removeByName('Updated');
@@ -68,7 +98,7 @@ class Product extends DataObject implements AkeneoImportInterface
             $fields->makeFieldReadonly($field);
         }
 
-        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create()));
+        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues()->filter('Locale.Code', [$locale, null]), GridFieldConfig_RecordViewer::create()));
 
         return $fields;
     }
@@ -103,7 +133,7 @@ class Product extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoProduct, string $locale, array $relatedObjectIds = []): void
+    public function populateAkeneoData(array $akeneoProduct, array $relatedObjectIds = []): void
     {
         $this->SKU = $akeneoProduct['identifier'];
         $this->Enabled = $akeneoProduct['enabled'];
@@ -126,5 +156,49 @@ class Product extends DataObject implements AkeneoImportInterface
     public static function getIdentifierField(): string
     {
         return 'SKU';
+    }
+
+    public function getLabelFromAttribute(): string
+    {
+        $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
+
+        return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
+    }
+
+    public function getLocalisedAttributeValues(?string $locale = null): DataList
+    {
+        if (!$locale) {
+            $locale = $this->getLocaleFromRequest();
+        }
+
+        return $this->getAttributeValuesForLocale($locale);
+    }
+
+    public function getLocalisedAttributeByCode(string $code, ?string $locale = null)
+    {
+        if (!$locale) {
+            $locale = $this->getLocaleFromRequest();
+        }
+
+        return $this->getAttributeValueForLocale($code, $locale);
+    }
+
+    public function getAttributeValueForLocale(string $code, ?string $locale = null): mixed
+    {
+        /** @var ProductAttributeValue|null $attributeValue */
+        $attributeValue = $this->AttributeValues()->filter([
+            'Code' => $code,
+            'Locale.Code' => $locale
+        ])->first();
+
+        return $attributeValue?->getValue() ?? '';
+    }
+
+    public function getAttributeValuesForLocale(string $locale): DataList
+    {
+        return $this->AttributeValues()->filterAny([
+            'Locale.Code' => $locale,
+            'LocaleID' => 0,
+        ]);
     }
 }

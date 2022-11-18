@@ -3,10 +3,9 @@
 namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
-class ProductCategory extends DataObject implements AkeneoImportInterface
+class ProductCategory extends AbstractAkeneoTranslateable implements AkeneoImportInterface
 {
     /** @config */
     private static string $table_name = 'Akeneo_ProductCategory';
@@ -21,10 +20,10 @@ class ProductCategory extends DataObject implements AkeneoImportInterface
     private static array $db = [
         'Sort' => 'Int',
         'Code' => 'Varchar(255)',
-        'Name' => 'Varchar(255)',
         'Updated' => 'Boolean',
     ];
 
+    /** @config */
     private static array $has_one = [
         'Parent' => self::class
     ];
@@ -80,14 +79,16 @@ class ProductCategory extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds): void
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds): void
     {
         $this->Code = $akeneoItem['code'];
         $this->Updated = true;
-        $this->Name = $akeneoItem['labels'][$locale] ?? $akeneoItem['code'];
+
         foreach ($relatedObjectIds as $field => $value) {
             $this->{$field} = $value;
         }
+
+        $this->updateLabels($akeneoItem);
     }
 
     public function getImportOutput(): string

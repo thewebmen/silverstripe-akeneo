@@ -4,11 +4,11 @@ namespace WeDevelop\Akeneo\Imports;
 
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\ValidationException;
 use WeDevelop\Akeneo\Models\AkeneoImportInterface;
 use WeDevelop\Akeneo\Models\Family;
 use WeDevelop\Akeneo\Models\FamilyVariant;
+use WeDevelop\Akeneo\Models\Locale;
 use WeDevelop\Akeneo\Models\Product;
 use WeDevelop\Akeneo\Models\ProductAssociation;
 use WeDevelop\Akeneo\Models\ProductAttribute;
@@ -114,8 +114,6 @@ class AkeneoImport
      */
     public function run(array $imports): void
     {
-        $locale = i18n::get_locale();
-
         foreach ($this->imports as $type => $class) {
             if (!empty($imports) && !in_array($type, $imports) && !$this->isRequiredParentImport($type, $imports)) {
                 continue;
@@ -126,10 +124,10 @@ class AkeneoImport
                 $parentRecords = $parentClass::get()->filter($this->importParents[$type]['filter']);
                 /** @var AkeneoImportInterface $parentRecord */
                 foreach ($parentRecords as $parentRecord) {
-                    $this->import($type, $locale, $parentClass, $parentRecord->{$parentClass::getIdentifierField()});
+                    $this->import($type, $parentClass, $parentRecord->{$parentClass::getIdentifierField()});
                 }
             } else {
-                $this->import($type, $locale);
+                $this->import($type);
             }
 
             if (in_array($type, ['products', 'productModels'])) {
@@ -152,7 +150,7 @@ class AkeneoImport
             in_array($this->requiredParentImport[$type], $import, true);
     }
 
-    protected function import(string $type, string $locale, ?string $parentImport = null, ?string $parentImportKey = null): void
+    protected function import(string $type, ?string $parentImport = null, ?string $parentImportKey = null): void
     {
         $this->output("Import " . $type . ($parentImportKey ? " of {$parentImportKey}" : ''));
         $class = $this->imports[$type];
@@ -193,11 +191,10 @@ class AkeneoImport
                 }
 
                 $relatedObjectIds = $this->findRelatedObjectIds($type, $akeneoItem, $parentImportKey);
-
-                $record->populateAkeneoData($akeneoItem, $locale, $relatedObjectIds);
+                $record->populateAkeneoData($akeneoItem, $relatedObjectIds);
 
                 if (in_array($type, ['products', 'productModels'])) {
-                    $this->setProductAttributes($record, $akeneoItem['values'], $locale);
+                    $this->setProductAttributes($record, $akeneoItem['values']);
 
                     $associationProperty = $type . 'Associations';
                     // remember relations to fill them when import of all product(models) is done
@@ -318,8 +315,7 @@ class AkeneoImport
         }
     }
 
-
-    protected function setProductAttributes(AkeneoImportInterface $productInstance, array $attributeValues, string $locale): void
+    protected function setProductAttributes(AkeneoImportInterface $productInstance, array $attributeValues): void
     {
         foreach ($attributeValues as $attributeCode => $values) {
             $attribute = ProductAttribute::get()->find('Code', $attributeCode);
@@ -329,18 +325,25 @@ class AkeneoImport
 
             /** @var  ProductModel|Product $productInstance */
             foreach ($values as $value) {
-                if (!$value['locale'] || $value['locale'] === $locale) {
-                    $attributeValue = $productInstance->AttributeValues()->find('AttributeID', $attribute->ID) ??
-                        new ProductAttributeValue();
-                    $attributeValue->AttributeID = $attribute->ID;
-                    if ($attribute->Type === ProductAttributeValue::PIM_CATALOG_TEXTAREA_TYPE) {
-                        $attributeValue->TextValue = $value['data'];
-                    } else {
-                        $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
-                    }
-                    $productInstance->AttributeValues()->add($attributeValue);
-                    break;
+                $akeneoLocale = $value['locale'] ?? null;
+                $locale = Locale::get()->find('Code', $akeneoLocale);
+
+                $attributeValue = $productInstance->AttributeValues()->filter([
+                    'AttributeID' => $attribute->ID,
+                    'LocaleID' => $locale->ID ?? 0,
+                ])->first();
+
+                $attributeValue = $attributeValue ?: new ProductAttributeValue();
+
+                $attributeValue->AttributeID = $attribute->ID;
+                $attributeValue->LocaleID = $locale?->ID;
+
+                if ($attribute->Type === ProductAttributeValue::PIM_CATALOG_TEXTAREA_TYPE) {
+                    $attributeValue->TextValue = $value['data'];
+                } else {
+                    $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
                 }
+                $productInstance->AttributeValues()->add($attributeValue);
             }
         }
     }

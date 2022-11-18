@@ -70,9 +70,10 @@ class AkeneoSiteConfigExtension extends DataExtension
     {
         $channels = $this->akeneoApi->getChannels();
         $locale = i18n::get_locale();
+        $options = [];
 
         foreach ($channels['_embedded']['items'] as $channel) {
-            $options[$channel['code']] = $channel['labels'][$locale];
+            $options[$channel['code']] = array_key_exists($locale, $channel['labels']) ? $channel['labels'][$locale] : $channel['code'];
         }
 
         return $options;

@@ -4,10 +4,13 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
-use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 
-class ProductAttribute extends DataObject implements AkeneoImportInterface
+/**
+ * @method HasManyList<ProductAttributeOption> Options()
+ */
+class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImportInterface
 {
     /** @config */
     private static string $table_name = 'Akeneo_ProductAttribute';
@@ -21,7 +24,6 @@ class ProductAttribute extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $db = [
         'Code' => 'Varchar(255)',
-        'Name' => 'Varchar(255)',
         'Type' => 'Varchar(255)',
         'Sort' => 'Int',
         'Updated' => 'Boolean',
@@ -110,17 +112,19 @@ class ProductAttribute extends DataObject implements AkeneoImportInterface
         return false;
     }
 
-    public function populateAkeneoData(array $akeneoItem, string $locale, array $relatedObjectIds = []): void
+    public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds = []): void
     {
         $this->Code = $akeneoItem['code'];
         $this->Type = $akeneoItem['type'];
         $this->Sort = $akeneoItem['sort_order'];
-        $this->Name = $akeneoItem['labels'][$locale] ?? $akeneoItem['code'];
+
         $this->Updated = true;
 
         foreach ($relatedObjectIds as $field => $value) {
             $this->{$field} = $value;
         }
+
+        $this->updateLabels($akeneoItem);
     }
 
     public function getImportOutput(): string

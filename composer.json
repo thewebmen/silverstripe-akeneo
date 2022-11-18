@@ -13,7 +13,10 @@
     "symbiote/silverstripe-gridfieldextensions": "^3.4"
   },
   "extra": {
-    "installer-name": "silverstripe-akeneo"
+    "installer-name": "silverstripe-akeneo",
+    "expose": [
+      "images"
+    ]
   },
   "autoload": {
     "psr-4": {

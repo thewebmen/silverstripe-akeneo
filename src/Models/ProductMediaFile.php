@@ -19,13 +19,16 @@ class ProductMediaFile extends DataObject
     /** @config */
     private static string $plural_name = 'Product Media Files';
 
-    private static $db = [
+    /** @config */
+    private static array $db = [
         'Code' => 'Varchar(255)',
     ];
 
-    private static $has_one = [
+    /** @config */
+    private static array $has_one = [
         'Document' => File::class,
-        'Image' => Image::class
+        'Image' => Image::class,
+        'Locale' => Locale::class
     ];
 
     public static function createFromAkeneoData(array $data, string $content): self
@@ -41,6 +44,7 @@ class ProductMediaFile extends DataObject
         }
 
         $productMediaFile->Code = $data['code'];
+
         $productMediaFile->write();
 
         return $productMediaFile;
