@@ -28,7 +28,6 @@ class ProductAttributeGroup extends AbstractAkeneoTranslateable implements Akene
     /** @config */
     private static array $has_many = [
         'Attributes' => ProductAttribute::class,
-        'LabelTranslations' => LabelTranslation::class
     ];
 
     /** @config */

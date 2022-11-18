@@ -26,11 +26,6 @@ class FamilyVariant extends AbstractAkeneoTranslateable implements AkeneoImportI
         'Family' => Family::class,
     ];
 
-    /** @config */
-    private static array $has_many = [
-        'LabelTranslations' => LabelTranslation::class
-    ];
-
     public function populateAkeneoData(array $akeneoItem, array $relatedObjectIds = []): void
     {
         $this->Code = $akeneoItem['code'];

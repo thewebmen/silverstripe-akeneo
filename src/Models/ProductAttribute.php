@@ -33,7 +33,6 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
     private static array $has_many = [
         'Options' => ProductAttributeOption::class,
         'Values' => ProductAttributeValue::class,
-        'LabelTranslations' => LabelTranslation::class
     ];
 
     /** @config */
@@ -125,11 +124,7 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
             $this->{$field} = $value;
         }
 
-        foreach (array_keys($akeneoItem['labels']) as $locale) {
-            $label = $this->LabelTranslations()->find('Locale.Code', $locale) ?? new LabelTranslation();
-            $label->Label = $akeneoItem['labels'][$locale];
-            $this->LabelTranslations()->add($label);
-        }
+        $this->updateLabels($akeneoItem);
     }
 
     public function getImportOutput(): string

@@ -28,11 +28,6 @@ class ProductAttributeOption extends AbstractAkeneoTranslateable implements Aken
     ];
 
     /** @config */
-    private static array $has_many = [
-        'LabelTranslations' => LabelTranslation::class
-    ];
-
-    /** @config */
     private static array $summary_fields = [
         'Code',
         'Name',

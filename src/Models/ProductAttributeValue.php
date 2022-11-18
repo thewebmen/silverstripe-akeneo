@@ -47,14 +47,9 @@ class ProductAttributeValue extends DataObject
 
     /** @config */
     private static array $summary_fields = [
-        'Attribute.Name' => 'Attribute',
+        'LocalisedAttributeName' => 'Attribute',
         'Value' => 'Value',
         'Attribute.Type' => 'Type',
-    ];
-
-    /** @config */
-    private static array $indexes = [
-        'LocaleID' => true,
     ];
 
     public function getValue()
@@ -136,5 +131,14 @@ class ProductAttributeValue extends DataObject
     public static function getIdentifierField(): string
     {
         return 'Code';
+    }
+
+    public function getLocalisedAttributeName(): string
+    {
+        if ($this->Locale()->exists()) {
+            return '[' . $this->Locale()->Code . '] ' . $this->Attribute()->Name;
+        }
+
+        return $this->Attribute()->Name;
     }
 }

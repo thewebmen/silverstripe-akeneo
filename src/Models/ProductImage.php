@@ -26,11 +26,6 @@ class ProductImage extends Image
         'Locale' => Locale::class
     ];
 
-    /** @config */
-    private static array $has_many = [
-        'LabelTranslations' => LabelTranslation::class
-    ];
-
     public static function createFromAkeneoData(array $data, string $content): self
     {
         $productImage = new self();

@@ -29,11 +29,6 @@ class ProductAssociation extends AbstractAkeneoTranslateable
     ];
 
     /** @config */
-    private static array $has_many = [
-        'LabelTranslations' => LabelTranslation::class
-    ];
-
-    /** @config */
     private static array $indexes = [
         'ProductIndex' => ['Type', 'ProductID'],
         'ProductModelIndex' => ['Type', 'ProductModelID'],

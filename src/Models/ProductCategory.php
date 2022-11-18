@@ -28,11 +28,6 @@ class ProductCategory extends AbstractAkeneoTranslateable implements AkeneoImpor
         'Parent' => self::class
     ];
 
-    /** @config */
-    private static array $has_many = [
-        'LabelTranslations' => LabelTranslation::class
-    ];
-
     /* @config */
     private static array $summary_fields = [
         'Code',

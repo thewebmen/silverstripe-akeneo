@@ -315,7 +315,6 @@ class AkeneoImport
         }
     }
 
-
     protected function setProductAttributes(AkeneoImportInterface $productInstance, array $attributeValues): void
     {
         foreach ($attributeValues as $attributeCode => $values) {
@@ -327,7 +326,7 @@ class AkeneoImport
             /** @var  ProductModel|Product $productInstance */
             foreach ($values as $value) {
                 $akeneoLocale = $value['locale'] ?? null;
-                $locale = Locale::get()->find('code', $akeneoLocale);
+                $locale = Locale::get()->find('Code', $akeneoLocale);
 
                 $attributeValue = $productInstance->AttributeValues()->filter([
                     'AttributeID' => $attribute->ID,
