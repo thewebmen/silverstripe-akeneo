@@ -40,6 +40,17 @@ class AkeneoSiteConfigExtension extends DataExtension
         }
     }
 
+    /**
+     * Do some cleanup before we write to the database
+     * 
+     * @return void
+     */
+    public function onBeforeWrite()
+    {
+        $this->owner->AkeneoURL = rtrim($this->owner->AkeneoURL ?? '', '/ ');
+        parent::onBeforeWrite();
+    }
+
     private function credentialsExist(): bool
     {
         return $this->owner->AkeneoURL &&
