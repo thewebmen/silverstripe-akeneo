@@ -55,6 +55,8 @@ class AkeneoImport
     private array $productModelsAssociations = [];
     private array $productsAssociations = [];
 
+    private bool $verbose = true;
+
     private AkeneoApi $akeneoApi;
 
     private array $associationMapping = [
@@ -454,6 +456,18 @@ class AkeneoImport
 
     protected function output($message)
     {
-        echo date('d-m-Y H:i:s') . ' : ' . $message . "\n";
+        if($this->verbose) {
+            echo date('d-m-Y H:i:s') . ' : ' . $message . "\n";
+        }
+    }
+
+    public function setVerbose(bool $verbose) : bool
+    {
+        return $this->verbose = $verbose;
+    }
+
+    public function getVerbose() : bool
+    {
+        return $this->verbose;
     }
 }
