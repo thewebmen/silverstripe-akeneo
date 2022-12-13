@@ -54,6 +54,7 @@ class AkeneoAdmin extends ModelAdmin
     {
         /** @var  AkeneoImport $import */
         $import = Injector::inst()->get('AkeneoImport');
+        $import->setVerbose(false);
         $import->run([]);
 
         Controller::curr()->getResponse()->addHeader('X-Status', 'Synced');
