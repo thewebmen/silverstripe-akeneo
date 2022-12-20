@@ -33,7 +33,7 @@ class AkeneoAdmin extends ModelAdmin
     private static string $menu_title = 'Akeneo';
 
     /** @config */
-    private static string $menu_icon = 'wedevelop/silverstripe-akeneo:images/akeneo.png';
+    private static string $menu_icon = 'wedevelopnl/silverstripe-akeneo:images/akeneo.png';
 
     public function getEditForm($id = null, $fields = null)
     {
