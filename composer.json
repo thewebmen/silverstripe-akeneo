@@ -10,7 +10,8 @@
     "php": "^8.0",
     "silverstripe/framework": "^4.11",
     "silverstripe/cms": "^4.11",
-    "symbiote/silverstripe-gridfieldextensions": "^3.4"
+    "symbiote/silverstripe-gridfieldextensions": "^3.4",
+    "undefinedoffset/sortablegridfield": "^2.1"
   },
   "extra": {
     "installer-name": "silverstripe-akeneo",

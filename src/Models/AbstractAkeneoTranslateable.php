@@ -30,7 +30,6 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
         /** @var LabelTranslation $translation */
         $translation = $this->LabelTranslations()->find('Locale.Code', $localeCode);
 
-
         return $translation->Label ?? $this->Code ?? '';
     }
 

@@ -55,6 +55,7 @@ class ProductAttributeValue extends DataObject
     public function getValue()
     {
         $value = $this->getField('Value');
+
         $attribute = $this->Attribute();
 
         switch ($attribute->Type) {
