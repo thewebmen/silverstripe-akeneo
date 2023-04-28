@@ -139,7 +139,7 @@ class DisplayGroup extends DataObject
 
         /** @var ProductAttribute $attribute */
         foreach ($attributes as $attribute) {
-            $html .= '<li>' . $attribute->getLabel()() . '</li>';
+            $html .= '<li>' . $attribute->getLabel() . '</li>';
         }
 
         $html .= '</ol>';
