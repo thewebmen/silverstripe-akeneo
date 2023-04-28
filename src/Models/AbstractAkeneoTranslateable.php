@@ -18,10 +18,14 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
         'LabelTranslations' => LabelTranslation::class,
     ];
 
+
+    public function getTitle(): string {
+        return $this->getLabel();
+    }
+
     public function getLabel(): string
     {
         $locale = $this->getLocaleFromRequest();
-
         return $this->getLabelForLocale($locale);
     }
 
