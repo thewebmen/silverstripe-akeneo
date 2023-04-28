@@ -34,7 +34,7 @@ class ProductModel extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $has_many = [
         'AttributeValues' => ProductAttributeValue::class,
-        'Associations' => ProductAssociation::class . '.ProductModel'
+        'Associations' => ProductAssociation::class . '.ProductModel',
     ];
 
     /** @config */

@@ -62,13 +62,13 @@ class Product extends DataObject implements AkeneoImportInterface
     private static array $summary_fields = [
         'SKU',
         'Family.Name' => 'Family',
-        'LabelFromAttribute' => 'Label'
+        'LabelFromAttribute' => 'Label',
     ];
 
     /** @config */
     private static array $searchable_fields = [
         'ID',
-        'SKU'
+        'SKU',
     ];
 
     public function getLocaleFromRequest(): string

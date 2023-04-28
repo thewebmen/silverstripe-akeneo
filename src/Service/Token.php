@@ -13,7 +13,6 @@ class Token
         private int    $expiresIn,
         private string $refreshToken
     ) {
-
     }
 
     public static function createFromResponse(ResponseInterface $response): self

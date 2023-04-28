@@ -121,7 +121,7 @@ class DisplayGroup extends DataObject
 
         $addExistingAutocompleter->setSearchList(
             DisplayGroup::get()->filter([
-                'ID:not' => array_merge([$this->ID], $this->ParentDisplayGroups()->column('ID'))
+                'ID:not' => array_merge([$this->ID], $this->ParentDisplayGroups()->column('ID')),
             ]),
         );
 
@@ -174,14 +174,14 @@ class DisplayGroup extends DataObject
     public static function getRootGroups()
     {
         return self::get()->filter([
-            'IsRootGroup' => 1
+            'IsRootGroup' => 1,
         ]);
     }
 
     public static function getNonRootGroups()
     {
         return self::get()->filter([
-            'IsRootGroup' => 0
+            'IsRootGroup' => 0,
         ]);
     }
 

@@ -13,6 +13,9 @@
     "symbiote/silverstripe-gridfieldextensions": "^3.4",
     "undefinedoffset/sortablegridfield": "^2.1"
   },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.4"
+  },
   "extra": {
     "installer-name": "silverstripe-akeneo",
     "expose": [
@@ -22,6 +25,12 @@
   "autoload": {
     "psr-4": {
       "WeDevelop\\Akeneo\\": "src/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": false,
+      "silverstripe/vendor-plugin": false
     }
   }
 }

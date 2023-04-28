@@ -34,7 +34,8 @@ class AkeneoSiteConfigExtension extends DataExtension
             TextField::create('AkeneoPassword', 'Password'),
         ]);
         if ($this->canConnect()) {
-            $fields->addFieldToTab('Root.Akeneo',
+            $fields->addFieldToTab(
+                'Root.Akeneo',
                 DropdownField::create('AkeneoChannel', 'Channel', $this->getAkeneoChannels())
             );
         }
@@ -42,7 +43,7 @@ class AkeneoSiteConfigExtension extends DataExtension
 
     /**
      * Do some cleanup before we write to the database
-     * 
+     *
      * @return void
      */
     public function onBeforeWrite()

@@ -19,7 +19,8 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
     ];
 
 
-    public function getTitle(): string {
+    public function getTitle(): string
+    {
         return $this->getLabel();
     }
 

@@ -6,7 +6,6 @@ use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBField;
 
 class ProductMediaFile extends DataObject
 {
@@ -28,7 +27,7 @@ class ProductMediaFile extends DataObject
     private static array $has_one = [
         'Document' => File::class,
         'Image' => Image::class,
-        'Locale' => Locale::class
+        'Locale' => Locale::class,
     ];
 
     public static function createFromAkeneoData(array $data, string $content): self

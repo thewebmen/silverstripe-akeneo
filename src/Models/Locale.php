@@ -11,7 +11,7 @@ class Locale extends DataObject
 
     /** @config */
     private static array $db = [
-        'Code' => 'Varchar(8)'
+        'Code' => 'Varchar(8)',
     ];
 
     /** @config */
@@ -19,6 +19,6 @@ class Locale extends DataObject
         ProductAttributeValue::class,
         ProductImage::class,
         ProductMediaFile::class,
-        LabelTranslation::class
+        LabelTranslation::class,
     ];
 }

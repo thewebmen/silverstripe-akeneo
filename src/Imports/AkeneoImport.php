@@ -80,7 +80,7 @@ class AkeneoImport
         'families' => Family::class,
         'variants' => FamilyVariant::class,
         'productModels' => ProductModel::class,
-        'products' => Product::class
+        'products' => Product::class,
     ];
 
     private array $importParents = [
@@ -94,7 +94,7 @@ class AkeneoImport
             'class' => Family::class,
             'filter' => [
             ],
-        ]
+        ],
     ];
 
     private array $requiredParentImport = [
@@ -117,7 +117,7 @@ class AkeneoImport
     public function run(array $imports): void
     {
         foreach ($this->imports as $type => $class) {
-            if (!empty($imports) && !in_array($type, $imports) && !$this->isRequiredParentImport($type, $imports)) {
+            if (!empty($imports) && !in_array($type, $imports, true) && !$this->isRequiredParentImport($type, $imports)) {
                 continue;
             }
 
@@ -132,7 +132,7 @@ class AkeneoImport
                 $this->import($type);
             }
 
-            if (in_array($type, ['products', 'productModels'])) {
+            if (in_array($type, ['products', 'productModels'], true)) {
                 $this->hasProductImport = true;
             }
         }
@@ -195,7 +195,7 @@ class AkeneoImport
                 $relatedObjectIds = $this->findRelatedObjectIds($type, $akeneoItem, $parentImportKey);
                 $record->populateAkeneoData($akeneoItem, $relatedObjectIds);
 
-                if (in_array($type, ['products', 'productModels'])) {
+                if (in_array($type, ['products', 'productModels'], true)) {
                     $this->setProductAttributes($record, $akeneoItem['values']);
 
                     $associationProperty = $type . 'Associations';
@@ -254,7 +254,7 @@ class AkeneoImport
             return ['FamilyID' => $this->families[$parentCode]->ID];
         }
 
-        if (in_array($type, ['productModels', 'products'])) {
+        if (in_array($type, ['productModels', 'products'], true)) {
             $familyCode = $akeneoItem['family'];
             $parentCode = $akeneoItem['parent'];
 
@@ -411,7 +411,6 @@ class AkeneoImport
                 }
                 $this->saveMediaFile($mediaFile);
             }
-
         } while ($page * $limit < $itemsCount);
 
         $this->output("Remove media files:");
@@ -456,17 +455,17 @@ class AkeneoImport
 
     protected function output($message)
     {
-        if($this->verbose) {
+        if ($this->verbose) {
             echo date('d-m-Y H:i:s') . ' : ' . $message . "\n";
         }
     }
 
-    public function setVerbose(bool $verbose) : bool
+    public function setVerbose(bool $verbose): bool
     {
         return $this->verbose = $verbose;
     }
 
-    public function getVerbose() : bool
+    public function getVerbose(): bool
     {
         return $this->verbose;
     }

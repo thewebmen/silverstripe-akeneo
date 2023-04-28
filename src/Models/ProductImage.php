@@ -23,7 +23,7 @@ class ProductImage extends Image
 
     /** @config */
     private static array $has_one = [
-        'Locale' => Locale::class
+        'Locale' => Locale::class,
     ];
 
     public static function createFromAkeneoData(array $data, string $content): self

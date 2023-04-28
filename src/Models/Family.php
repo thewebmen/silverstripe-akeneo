@@ -33,7 +33,7 @@ class Family extends AbstractAkeneoTranslateable implements AkeneoImportInterfac
 
     /** @config */
     private static array $has_many = [
-        'Variants' => FamilyVariant::class
+        'Variants' => FamilyVariant::class,
     ];
 
     /** @config */

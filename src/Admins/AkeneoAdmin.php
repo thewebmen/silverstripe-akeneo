@@ -73,7 +73,7 @@ class AkeneoAdmin extends ModelAdmin
             $fields->push(TabSet::create('Root', 'Root'));
             $fields->addFieldsToTab('Root.Root Groups', [
                 HeaderField::create('RootHeader', 'Root groups have no parent group associated with them'),
-                $gridField
+                $gridField,
             ]);
 
             $fields->addFieldsToTab('Root.Sub Groups', [

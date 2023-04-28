@@ -4,3 +4,4 @@ composer.lock
 node_modules/
 gulpfile.js
 package-lock.json
+.php-cs-fixer.cache

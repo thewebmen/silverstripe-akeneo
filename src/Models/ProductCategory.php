@@ -25,7 +25,7 @@ class ProductCategory extends AbstractAkeneoTranslateable implements AkeneoImpor
 
     /** @config */
     private static array $has_one = [
-        'Parent' => self::class
+        'Parent' => self::class,
     ];
 
     /* @config */

@@ -7,9 +7,10 @@ namespace WeDevelop\Akeneo\Util;
 use WeDevelop\Akeneo\Models\ProductAttributeOption;
 use WeDevelop\Akeneo\Models\ProductAttributeValue;
 
-abstract class AttributeParser {
-
-    public static function MetricTypeParser(ProductAttributeValue $value): ?string {
+abstract class AttributeParser
+{
+    public static function MetricTypeParser(ProductAttributeValue $value): ?string
+    {
         if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_METRIC_TYPE) {
             throw new \RuntimeException('Not a metric attribute value');
         }
@@ -31,7 +32,8 @@ abstract class AttributeParser {
         ]);
     }
 
-    public static function MultiSelectParser(ProductAttributeValue $value): string {
+    public static function MultiSelectParser(ProductAttributeValue $value): string
+    {
         if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_MULTISELECT_TYPE) {
             throw new \RuntimeException('Not a multi select attribute value');
         }
@@ -41,14 +43,15 @@ abstract class AttributeParser {
             return null;
         }
 
-        $attributeNames = array_map(static function(ProductAttributeOption $option) {
+        $attributeNames = array_map(static function (ProductAttributeOption $option) {
             return $option->getName();
         }, $value->Attribute()->Options()->filter('Code', $jsonValues)->toArray());
 
         return implode(', ', $attributeNames);
     }
 
-    public static function PriceCollectionParser(ProductAttributeValue $value): string {
+    public static function PriceCollectionParser(ProductAttributeValue $value): string
+    {
         if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_PRICE_COLLECTION) {
             throw new \RuntimeException('Not a price collection attribute value');
         }

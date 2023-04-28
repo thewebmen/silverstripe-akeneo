@@ -44,7 +44,7 @@ class ProductAttributeValue extends DataObject
         'ProductModel' => ProductModel::class,
         'Product' => Product::class,
         'Attribute' => ProductAttribute::class,
-        'Locale' => Locale::class
+        'Locale' => Locale::class,
     ];
 
     /** @config */

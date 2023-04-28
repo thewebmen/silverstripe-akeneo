@@ -38,7 +38,7 @@ class LabelTranslation extends DataObject
         'ProductCategory' => ProductCategory::class,
         'ProductModel' => ProductModel::class,
         'ProductMediaFile' => ProductMediaFile::class,
-        'ProductImage' => ProductImage::class
+        'ProductImage' => ProductImage::class,
     ];
 
     public function getCMSFields()

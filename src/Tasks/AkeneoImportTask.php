@@ -8,7 +8,6 @@ use WeDevelop\Akeneo\Imports\AkeneoImport;
 
 class AkeneoImportTask extends BuildTask
 {
-
     /** @config */
     protected $title = 'Akeneo import';
 

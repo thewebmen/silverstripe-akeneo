@@ -17,7 +17,7 @@ class ProductAssociation extends AbstractAkeneoTranslateable
 
     /** @config */
     private static array $db = [
-        'Type' => 'Varchar(255)'
+        'Type' => 'Varchar(255)',
     ];
 
     /** @config */

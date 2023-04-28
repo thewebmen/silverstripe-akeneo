@@ -49,7 +49,8 @@ class AkeneoApi
             'limit' => $limit,
         ];
 
-        return $this->request('categories', ['query' => $query]);;
+        return $this->request('categories', ['query' => $query]);
+        ;
     }
 
     public function getAttributes(int $page = 1, int $limit = 100): array
@@ -59,7 +60,8 @@ class AkeneoApi
             'limit' => $limit,
         ];
 
-        return $this->request('attributes', ['query' => $query]);;
+        return $this->request('attributes', ['query' => $query]);
+        ;
     }
 
     public function getAttributeGroups(int $page = 1, int $limit = 100): array
@@ -214,9 +216,8 @@ class AkeneoApi
             $response = $this->tokenClient->post('token', [
                 'headers' => $headers,
                 'auth' => $auth,
-                'body' => json_encode($body)
+                'body' => json_encode($body),
             ]);
-
         } catch (\Exception $e) {
             Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
             throw $e;
@@ -241,9 +242,8 @@ class AkeneoApi
             $response = $this->tokenClient->post('token', [
                 'headers' => $headers,
                 'auth' => $auth,
-                'body' => json_encode($body)
+                'body' => json_encode($body),
             ]);
-
         } catch (\Exception $e) {
             Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
             throw $e;
