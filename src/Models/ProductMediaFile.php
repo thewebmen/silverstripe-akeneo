@@ -50,17 +50,17 @@ class ProductMediaFile extends DataObject
         return $productMediaFile;
     }
 
-    public function getAttributeValue(): DBField
+    public function getAttributeValue()
     {
         if ($this->DocumentID) {
-            return DBField::create_field('HTMLText', sprintf('<a href="%s" target="_blank">%s</a>', $this->Document->Link(), $this->Document->Title));
+            return $this->Document;
         }
 
         if ($this->ImageID) {
-            return DBField::create_field('HTMLText', '<img src="' . $this->Image->PreviewLink() . '"/>');
+            return $this->Image;
         }
 
-        return DBField::create_field('Text', '');
+        return null;
     }
 
     public static function getFolderID(string $type): int
