@@ -8,6 +8,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
+use WeDevelop\Akeneo\Util\AttributeParser;
 
 /**
  * @method ProductAttribute Attribute()
@@ -17,6 +18,7 @@ class ProductAttributeValue extends DataObject
     public const PIM_CATALOG_DATE = 'pim_catalog_date';
     public const PIM_CATALOG_FILE_TYPE = 'pim_catalog_file';
     public const PIM_CATALOG_IMAGE_TYPE = 'pim_catalog_image';
+    public const PIM_CATALOG_METRIC_TYPE = 'pim_catalog_metric';
     public const PIM_CATALOG_MULTISELECT_TYPE = 'pim_catalog_multiselect';
     public const PIM_CATALOG_PRICE_COLLECTION = 'pim_catalog_price_collection';
     public const PIM_CATALOG_SIMPLESELECT_TYPE = 'pim_catalog_simpleselect';
@@ -57,29 +59,16 @@ class ProductAttributeValue extends DataObject
         $value = $this->getField('Value');
         $attribute = $this->Attribute();
 
-        switch ($attribute->Type) {
-            case self::PIM_CATALOG_SIMPLESELECT_TYPE:
-                return $attribute->Options()->filter('Code', $value)->first()->Name;
-            case self::PIM_CATALOG_MULTISELECT_TYPE:
-                $values = json_decode($value);
-                $attributeNames = array_map(static function(ProductAttributeOption $option) {
-                    return $option->getName();
-                }, $attribute->Options()->filter('Code', $values)->toArray());
-
-                return implode(', ', $attributeNames);
-            case self::PIM_CATALOG_PRICE_COLLECTION:
-                $price = json_decode($value, true);
-                return $price[0]['currency'] . ' ' . $price[0]['amount'];
-            case self::PIM_CATALOG_FILE_TYPE:
-            case self::PIM_CATALOG_IMAGE_TYPE:
-                return ProductMediaFile::get()->find('Code', $value)?->getAttributeValue();
-            case self::PIM_CATALOG_DATE:
-                return DBDatetime::create()->setValue($value)->Nice();
-            case self::PIM_CATALOG_TEXTAREA_TYPE:
-                return DBField::create_field('HTMLText', $this->getField('TextValue'));
-            default:
-                return $value;
-        }
+        return match ($attribute->Type) {
+            self::PIM_CATALOG_SIMPLESELECT_TYPE => $attribute->Options()->filter('Code', $value)->first()->Name,
+            self::PIM_CATALOG_MULTISELECT_TYPE => DBField::create_field('HTMLText', AttributeParser::MultiSelectParser($this)),
+            self::PIM_CATALOG_PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
+            self::PIM_CATALOG_FILE_TYPE, self::PIM_CATALOG_IMAGE_TYPE => ProductMediaFile::get()->find('Code', $value)?->getAttributeValue(),
+            self::PIM_CATALOG_DATE => DBDatetime::create()->setValue($value)->Nice(),
+            self::PIM_CATALOG_TEXTAREA_TYPE => DBField::create_field('HTMLText', $this->getField('TextValue')),
+            self::PIM_CATALOG_METRIC_TYPE => DBField::create_field('HTMLText', AttributeParser::MetricTypeParser($this)),
+            default => strval($value),
+        };
     }
 
     public function onAfterDelete()

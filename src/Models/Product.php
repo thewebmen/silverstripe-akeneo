@@ -10,7 +10,9 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
+use SilverStripe\View\ArrayData;
 use WeDevelop\Akeneo\Pages\ProductPage;
+use SilverStripe\ORM\ArrayList;
 
 /**
  * @method HasManyList<ProductAttributeValue> AttributeValues()
@@ -158,6 +160,11 @@ class Product extends DataObject implements AkeneoImportInterface
         return 'SKU';
     }
 
+    public function getLabel(): string
+    {
+        return $this->getLabelFromAttribute();
+    }
+
     public function getLabelFromAttribute(): string
     {
         $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
@@ -202,5 +209,48 @@ class Product extends DataObject implements AkeneoImportInterface
             'Locale.Code' => $locale,
             'LocaleID' => 0,
         ]);
+    }
+
+    /**
+     * @return ArrayList<ArrayData<string, string|Product>>
+     */
+    public function getRelatedProducts(): ArrayList
+    {
+        $relatedProducts = ArrayList::create();
+
+        foreach ($this->Associations() as $association) {
+            $associationType = $association->Type;
+
+            $relatedProducts->add(
+                ArrayData::create([
+                    'Type' => $associationType,
+                    'Product' => $association->RelatedProduct(),
+                ])
+            );
+        }
+
+        return $relatedProducts;
+    }
+
+    /**
+     * @param string|null $type
+     * @return ArrayList<Product>
+     */
+    public function getRelatedProductsByType(?string $type): ArrayList
+    {
+        $relatedProducts = ArrayList::create();
+
+        foreach ($this->Associations() as $association) {
+            if (!$type) {
+                $relatedProducts->add($association->RelatedProduct());
+                continue;
+            }
+
+            if ($type === $association->Type) {
+                $relatedProducts->add($association->RelatedProduct());
+            }
+        }
+
+        return $relatedProducts;
     }
 }

@@ -13,4 +13,6 @@ SilverStripe\Core\Injector\Injector:
   AkeneoImport:
     class: WeDevelop\Akeneo\Imports\AkeneoImport
 
+WeDevelop\Config\AkeneoConfig:
+  enable_display_groups: true
 

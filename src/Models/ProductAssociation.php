@@ -41,6 +41,10 @@ class ProductAssociation extends AbstractAkeneoTranslateable
         'RelatedObjectIdentifier' => 'Related Object',
     ];
 
+    /** @config */
+    private static array $searchable_fields = [
+        'Type',
+    ];
 
     public function getRelatedType(): string
     {
