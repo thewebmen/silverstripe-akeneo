@@ -5,6 +5,11 @@
     "akeneo",
     "pim"
   ],
+  "license": "BSD-3-Clause",
+  "authors": [{
+      "name": "WeDevelop",
+      "email": "development@wedevelop.nl"
+  }],
   "type": "silverstripe-vendormodule",
   "require": {
     "php": "^8.0",
