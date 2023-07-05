@@ -28,10 +28,15 @@ class ProductCategory extends AbstractAkeneoTranslateable implements AkeneoImpor
         'Parent' => self::class,
     ];
 
-    /* @config */
+    /** @config */
     private static array $summary_fields = [
         'Code',
         'Name',
+    ];
+
+    /** @config */
+    private static array $belongs_many_many = [
+        'Product' => Product::class,
     ];
 
     public function getCMSFields()

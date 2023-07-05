@@ -116,7 +116,7 @@ class AkeneoImport
      */
     public function run(array $imports): void
     {
-        foreach ($this->imports as $type => $class) {
+        foreach (array_keys($this->imports) as $type) {
             if (!empty($imports) && !in_array($type, $imports, true) && !$this->isRequiredParentImport($type, $imports)) {
                 continue;
             }
@@ -276,7 +276,7 @@ class AkeneoImport
 
             if ($parentCode) {
                 $parent = ProductModel::get()->find('Code', $parentCode);
-                $ids['ParentID'] = $parent?->ID;
+                $ids['ProductModelID'] = $parent?->ID;
             }
 
             return $ids;

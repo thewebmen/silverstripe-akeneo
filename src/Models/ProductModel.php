@@ -2,6 +2,7 @@
 
 namespace WeDevelop\Akeneo\Models;
 
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
@@ -107,5 +108,13 @@ class ProductModel extends DataObject implements AkeneoImportInterface
     public static function getIdentifierField(): string
     {
         return 'Code';
+    }
+
+    /**
+     * @return DataList<Product>
+     */
+    public function getProducts(): DataList
+    {
+        return Product::get()->filter('ProductModelID', $this->ID);
     }
 }

@@ -11,12 +11,12 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\View\ArrayData;
-use WeDevelop\Akeneo\Pages\ProductPage;
 use SilverStripe\ORM\ArrayList;
 
 /**
  * @method HasManyList<ProductAttributeValue> AttributeValues()
  * @method HasManyList<ProductAssociation> Associations()
+ * @method ?ProductModel ProductModel()
  */
 class Product extends DataObject implements AkeneoImportInterface
 {
@@ -39,7 +39,7 @@ class Product extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $has_one = [
         'Family' => Family::class,
-        'Parent' => ProductModel::class,
+        'ProductModel' => ProductModel::class,
     ];
 
     /** @config */
@@ -51,11 +51,6 @@ class Product extends DataObject implements AkeneoImportInterface
     /** @config */
     private static array $many_many = [
         'Categories' => ProductCategory::class,
-    ];
-
-    /** @config */
-    private static array $belongs_to = [
-        'ProductPage' => ProductPage::class,
     ];
 
     /** @config */
@@ -165,10 +160,20 @@ class Product extends DataObject implements AkeneoImportInterface
         return $this->getLabelFromAttribute();
     }
 
+    public function getVariantLabel(): string
+    {
+        $attributeAsLabelCode = match (true) {
+            $this->isProduct() => $this->Family()->AttributeAsLabel()->Code,
+            $this->isProductModel() => 'Variant_Name',
+            default => throw new \RunTimeException('Invalid product type'),
+        };
+
+        return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
+    }
+
     public function getLabelFromAttribute(): string
     {
         $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
-
         return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
     }
 
@@ -252,5 +257,15 @@ class Product extends DataObject implements AkeneoImportInterface
         }
 
         return $relatedProducts;
+    }
+
+    public function isProduct(): bool
+    {
+        return !$this->ProductModel || !$this->ProductModel()->exists();
+    }
+
+    public function isProductModel(): bool
+    {
+        return $this->ProductModel && $this->ProductModel->exists();
     }
 }
