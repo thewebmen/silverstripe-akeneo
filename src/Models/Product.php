@@ -160,17 +160,6 @@ class Product extends DataObject implements AkeneoImportInterface
         return $this->getLabelFromAttribute();
     }
 
-    public function getVariantLabel(): string
-    {
-        $attributeAsLabelCode = match (true) {
-            $this->isProduct() => $this->Family()->AttributeAsLabel()->Code,
-            $this->isProductModel() => 'Variant_Name',
-            default => throw new \RunTimeException('Invalid product type'),
-        };
-
-        return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
-    }
-
     public function getLabelFromAttribute(): string
     {
         $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
@@ -259,12 +248,7 @@ class Product extends DataObject implements AkeneoImportInterface
         return $relatedProducts;
     }
 
-    public function isProduct(): bool
-    {
-        return !$this->ProductModel || !$this->ProductModel()->exists();
-    }
-
-    public function isProductModel(): bool
+    public function hasProductModel(): bool
     {
         return $this->ProductModel && $this->ProductModel->exists();
     }
