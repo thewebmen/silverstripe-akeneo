@@ -93,12 +93,26 @@ class AkeneoAdmin extends ModelAdmin
 
     public function doSync(): void
     {
-        /** @var  AkeneoImport $import */
-        $import = Injector::inst()->get('AkeneoImport');
-        $import->setVerbose(false);
-        $import->run([]);
+        try {
+          $importMessage = self::asyncImport();
+        } catch (\Exception $e) {
+          $importMessage = $e->getMessage();
+        }
 
-        Controller::curr()->getResponse()->addHeader('X-Status', 'Synced');
+        Controller::curr()->getResponse()->addHeader('X-Status', $importMessage);
+    }
+
+    public static function  asyncImport(): string
+    {
+        exec('ps | grep AkeneoImportTask', $psOutput);
+
+        if (!empty($psOutput) && count($psOutput) > 2) {
+            throw new \Exception('An import is still running.');
+        }
+
+        exec('php ../vendor/silverstripe/framework/cli-script.php dev/tasks/AkeneoImportTask > /dev/null &');
+
+        return 'Import started';
     }
 
     public function getCMSEditLink(DataObject $object, string $subTab = ''): string
