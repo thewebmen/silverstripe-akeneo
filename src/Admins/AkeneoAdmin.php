@@ -82,10 +82,12 @@ class AkeneoAdmin extends ModelAdmin
             ]);
         }
 
+        $importRunning = self::isImportRunning();
         $form->Actions()->push(
-            FormAction::create('doSync', 'Sync with Akeneo')
+            FormAction::create('doSync', self::isImportRunning() ? 'Import running' : 'Sync with Akeneo')
                 ->setUseButtonTag(true)
                 ->addExtraClass('btn btn-primary mt-2 mb-2 icon font-icon-sync')
+                ->setDisabled($importRunning)
         );
 
         return $form;
@@ -102,14 +104,19 @@ class AkeneoAdmin extends ModelAdmin
         Controller::curr()->getResponse()->addHeader('X-Status', $importMessage);
     }
 
-    public static function  asyncImport(): string
+    private static function isImportRunning(): bool
     {
         exec('ps | grep AkeneoImportTask', $psOutput);
 
-        if (!empty($psOutput) && count($psOutput) > 2) {
+        return (!empty($psOutput) && count($psOutput) > 2);
+    }
+
+    public static function  asyncImport(): string
+    {
+        if (self::isImportRunning()) {
             throw new \Exception('An import is still running.');
         }
-
+        
         exec('php ../vendor/silverstripe/framework/cli-script.php dev/tasks/AkeneoImportTask > /dev/null &');
 
         return 'Import started';
