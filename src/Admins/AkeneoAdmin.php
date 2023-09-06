@@ -116,8 +116,9 @@ class AkeneoAdmin extends ModelAdmin
         if (self::isImportRunning()) {
             throw new \Exception('An import is still running.');
         }
-        
-        exec('php ../vendor/silverstripe/framework/cli-script.php dev/tasks/AkeneoImportTask > /dev/null &');
+
+        $command = sprintf('php%s ../vendor/silverstripe/framework/cli-script.php dev/tasks/AkeneoImportTask > /dev/null &', self::currentPHPversion());
+        exec($command);
 
         return 'Import started';
     }
@@ -153,5 +154,12 @@ class AkeneoAdmin extends ModelAdmin
         }
 
         return $managed;
+    }
+
+    private static function currentPHPversion(): string
+    {
+        $majorityParts = explode('.', phpversion());
+
+        return implode('.', array_slice($majorityParts, 0, 2));
     }
 }
