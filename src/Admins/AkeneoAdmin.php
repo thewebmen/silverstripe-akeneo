@@ -82,10 +82,12 @@ class AkeneoAdmin extends ModelAdmin
             ]);
         }
 
+        $importRunning = self::isImportRunning();
         $form->Actions()->push(
-            FormAction::create('doSync', 'Sync with Akeneo')
+            FormAction::create('doSync', self::isImportRunning() ? 'Import running' : 'Sync with Akeneo')
                 ->setUseButtonTag(true)
                 ->addExtraClass('btn btn-primary mt-2 mb-2 icon font-icon-sync')
+                ->setDisabled($importRunning)
         );
 
         return $form;
@@ -93,12 +95,32 @@ class AkeneoAdmin extends ModelAdmin
 
     public function doSync(): void
     {
-        /** @var  AkeneoImport $import */
-        $import = Injector::inst()->get('AkeneoImport');
-        $import->setVerbose(false);
-        $import->run([]);
+        try {
+          $importMessage = self::asyncImport();
+        } catch (\Exception $e) {
+          $importMessage = $e->getMessage();
+        }
 
-        Controller::curr()->getResponse()->addHeader('X-Status', 'Synced');
+        Controller::curr()->getResponse()->addHeader('X-Status', $importMessage);
+    }
+
+    private static function isImportRunning(): bool
+    {
+        exec('ps | grep AkeneoImportTask', $psOutput);
+
+        return (!empty($psOutput) && count($psOutput) > 2);
+    }
+
+    public static function  asyncImport(): string
+    {
+        if (self::isImportRunning()) {
+            throw new \Exception('An import is still running.');
+        }
+
+        $command = sprintf('php%s ../vendor/silverstripe/framework/cli-script.php dev/tasks/AkeneoImportTask > /dev/null &', self::currentPHPversion());
+        exec($command);
+
+        return 'Import started';
     }
 
     public function getCMSEditLink(DataObject $object, string $subTab = ''): string
@@ -132,5 +154,12 @@ class AkeneoAdmin extends ModelAdmin
         }
 
         return $managed;
+    }
+
+    private static function currentPHPversion(): string
+    {
+        $majorityParts = explode('.', phpversion());
+
+        return implode('.', array_slice($majorityParts, 0, 2));
     }
 }

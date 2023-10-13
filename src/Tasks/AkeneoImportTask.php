@@ -22,7 +22,6 @@ class AkeneoImportTask extends BuildTask
         /** @var  AkeneoImport $import */
         $import = Injector::inst()->get('AkeneoImport');
         $imports = $request->getVar('import');
-
         $import->run($imports ? explode(',', $imports) : []);
     }
 }
