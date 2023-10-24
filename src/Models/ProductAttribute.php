@@ -4,6 +4,7 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 
@@ -89,7 +90,8 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
      */
     public function canEdit($member = null)
     {
-        return false;
+        // setting this to true to be able to use GridFieldSortableRows component
+        return true;
     }
 
     /**
