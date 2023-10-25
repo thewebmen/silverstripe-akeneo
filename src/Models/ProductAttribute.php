@@ -5,6 +5,7 @@ namespace WeDevelop\Akeneo\Models;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\i18n\i18n;
+use SilverStripe\ORM\DataQuery;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 
@@ -54,11 +55,19 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
 
     /** @config */
     private static array $summary_fields = [
+        'getLabelByLocale' => 'Label',
         'Code' => 'Code',
         'Type' => 'Type',
         'Options.Count' => 'Options',
     ];
 
+    private static array $searchable_fields = [
+        'LabelByLocale' => [
+            'title' => 'Label',
+            'filter' => \WeDevelop\Akeneo\Filters\TranslationLabelFilter::class,
+            'relation' => 'LabelTranslations',
+        ],
+    ];
     /** @config */
     private static string $default_sort = 'Sort';
 
@@ -137,5 +146,39 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
     public static function getIdentifierField(): string
     {
         return 'Code';
+    }
+
+    public function getLabelByLocale(): string
+    {
+        if (class_exists('TractorCow\Fluent\Model\Locale')) {
+            $localeObj = call_user_func(['TractorCow\Fluent\Model\Locale', 'getCurrentLocale']);
+            $locale = $localeObj->Locale;
+        } else {
+            $locale = i18n::get_locale();
+        }
+
+        $labelTranslation = $this->LabelTranslations()->filter('Locale.Code', $locale)->first();
+
+        return $labelTranslation ? $labelTranslation->Label : '';
+    }
+
+    public static function filterByLabel(DataQuery $query, string $value, string $locale = 'nl_NL')
+    {
+        $labelTranslationIDs = LabelTranslation::get()->filter(['Label:PartialMatch' => $value])->column('ID');
+        $query->leftJoin('Akeneo_Label_Translations', '"Akeneo_Label_Translations"."ProductAttributeID" = "Akeneo_ProductAttribute"."ID"');
+
+        $locale = \WeDevelop\Akeneo\Models\Locale::get()->filter(['code' => $locale])->first();
+
+        if (empty($labelTranslationIDs) || (!$locale)) {
+            $query->where("0 = 1");
+        } else {
+            $idsString = implode(',', $labelTranslationIDs);
+            $query->where("\"Akeneo_Label_Translations\".\"ID\" IN ({$idsString}) and \"Akeneo_Label_Translations\".\"LocaleID\" = {$locale->ID}");
+        }
+
+        $query->selectField('"Akeneo_Label_Translations"."Label"', 'SearchLabel');
+
+        $query->sort([]);
+        return $query;
     }
 }

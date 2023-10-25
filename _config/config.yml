@@ -12,7 +12,8 @@ SilverStripe\CMS\Model\SiteTree:
 SilverStripe\Core\Injector\Injector:
   AkeneoImport:
     class: WeDevelop\Akeneo\Imports\AkeneoImport
-
+  DataListFilter.TranslationLabel:
+    class: WeDevelop\Akeneo\Filters\TranslationLabelFilter
 WeDevelop\Config\AkeneoConfig:
   enable_display_groups: true
 

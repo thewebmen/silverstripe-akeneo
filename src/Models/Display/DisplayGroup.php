@@ -104,6 +104,11 @@ class DisplayGroup extends DataObject
             GridFieldSortableRows::create('SortOrder'),
         ]);
 
+
+        /** @var GridFieldAddExistingAutocompleter $addExistingAutocompleter */
+        $addExistingAutocompleter = $config->getComponentByType(GridFieldAddExistingAutocompleter::class);
+        $addExistingAutocompleter->setResultsFormat('$LabelByLocale');
+
         return $gridField;
     }
 
