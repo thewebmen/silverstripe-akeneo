@@ -23,6 +23,7 @@ class ProductAttributeValue extends DataObject
     public const PIM_CATALOG_PRICE_COLLECTION = 'pim_catalog_price_collection';
     public const PIM_CATALOG_SIMPLESELECT_TYPE = 'pim_catalog_simpleselect';
     public const PIM_CATALOG_TEXTAREA_TYPE = 'pim_catalog_textarea';
+    public const PIM_CATALOG_BOOLEAN_TYPE = 'pim_catalog_boolean';
 
     /** @config */
     private static string $table_name = 'Akeneo_ProductAttributeValue';
@@ -67,6 +68,7 @@ class ProductAttributeValue extends DataObject
             self::PIM_CATALOG_DATE => DBDatetime::create()->setValue($value)->Nice(),
             self::PIM_CATALOG_TEXTAREA_TYPE => DBField::create_field('HTMLText', $this->getField('TextValue')),
             self::PIM_CATALOG_METRIC_TYPE => DBField::create_field('HTMLText', AttributeParser::MetricTypeParser($this)),
+            self::PIM_CATALOG_BOOLEAN_TYPE => (bool)$value ? _t(__CLASS__.'.Yes', 'Yes') : _t(__CLASS__.'.No', 'No'),
             default => strval($value),
         };
     }

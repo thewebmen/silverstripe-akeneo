@@ -1,0 +1,4 @@
+nl:
+  WeDevelop\Akeneo\Models\ProductAttributeValue:
+    Yes: 'Ja'
+    No: 'Nee'
