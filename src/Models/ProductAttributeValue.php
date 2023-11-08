@@ -57,7 +57,9 @@ class ProductAttributeValue extends DataObject
 
     public function getValue()
     {
-        $value = $this->getField('Value');
+        if (($value = $this->getField('Value')) === null) {
+            return null;
+        }
         $attribute = $this->Attribute();
 
         return match ($attribute->Type) {
