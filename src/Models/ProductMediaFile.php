@@ -73,7 +73,7 @@ class ProductMediaFile extends DataObject
 
         /** @var File $file */
         $file = new $mediaFileClass();
-        $file->setFromString($content, sprintf('%s_%s', base64_encode($data['code']), $data['original_filename']));
+        $file->setFromString($content, sprintf('%s_%s', crc32($content), $data['original_filename']));
 
         $type = $file->appCategory();
 
