@@ -4,7 +4,7 @@ nl:
     No: 'Nee'
   WeDevelop\Akeneo\Util\AttributeParser:
     MILISECOND: 'Miliseconden'
-    SECONDS: 'Seconden'
+    SECOND: 'Seconden'
     MINUTE: 'Minuut'
     HOUR: 'Uur'
     DAY: 'Dag'
