@@ -28,7 +28,7 @@ abstract class AttributeParser
 
         return vsprintf('%s %s', [
             round(floatval($decodedValue['amount']), 2),
-            ucfirst(strtolower($decodedValue['unit'])),
+            _t(__CLASS__ . '.' . strtoupper($decodedValue['unit']), ucfirst(strtolower($decodedValue['unit']))),
         ]);
     }
 

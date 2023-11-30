@@ -2,3 +2,12 @@ nl:
   WeDevelop\Akeneo\Models\ProductAttributeValue:
     Yes: 'Ja'
     No: 'Nee'
+  WeDevelop\Akeneo\Util\AttributeParser:
+    MILISECOND: 'Miliseconden'
+    SECONDS: 'Seconden'
+    MINUTE: 'Minuut'
+    HOUR: 'Uur'
+    DAY: 'Dag'
+    WEEK: 'Week'
+    MONTH: 'Maand'
+    YEAR: 'Jaar'
