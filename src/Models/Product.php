@@ -6,12 +6,12 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\i18n\i18n;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\View\ArrayData;
-use SilverStripe\ORM\ArrayList;
 
 /**
  * @method HasManyList<ProductAttributeValue> AttributeValues()
@@ -83,10 +83,13 @@ class Product extends DataObject implements AkeneoImportInterface
         return $request->getVar('locale') ?? i18n::get_locale();
     }
 
+    /**
+     * @todo, properly filter attributes for the active locale when using fluent.
+     *   (EF): for now I've removed the filter from the attribute list so we can
+     *   show all attributes in the cms.
+     */
     public function getCMSFields()
     {
-        $locale = $this->getLocaleFromRequest();
-
         $fields = parent::getCMSFields();
 
         $fields->removeByName('Updated');
@@ -95,7 +98,7 @@ class Product extends DataObject implements AkeneoImportInterface
             $fields->makeFieldReadonly($field);
         }
 
-        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues()->filter('Locale.Code', [$locale, null]), GridFieldConfig_RecordViewer::create()));
+        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create()));
 
         return $fields;
     }
