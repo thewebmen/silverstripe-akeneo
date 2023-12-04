@@ -8,6 +8,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
+use WeDevelop\Akeneo\Enums\ProductAttributeType;
 use WeDevelop\Akeneo\Util\AttributeParser;
 
 /**
@@ -15,16 +16,6 @@ use WeDevelop\Akeneo\Util\AttributeParser;
  */
 class ProductAttributeValue extends DataObject
 {
-    public const PIM_CATALOG_DATE = 'pim_catalog_date';
-    public const PIM_CATALOG_FILE_TYPE = 'pim_catalog_file';
-    public const PIM_CATALOG_IMAGE_TYPE = 'pim_catalog_image';
-    public const PIM_CATALOG_METRIC_TYPE = 'pim_catalog_metric';
-    public const PIM_CATALOG_MULTISELECT_TYPE = 'pim_catalog_multiselect';
-    public const PIM_CATALOG_PRICE_COLLECTION = 'pim_catalog_price_collection';
-    public const PIM_CATALOG_SIMPLESELECT_TYPE = 'pim_catalog_simpleselect';
-    public const PIM_CATALOG_TEXTAREA_TYPE = 'pim_catalog_textarea';
-    public const PIM_CATALOG_BOOLEAN_TYPE = 'pim_catalog_boolean';
-
     /** @config */
     private static string $table_name = 'Akeneo_ProductAttributeValue';
 
@@ -62,15 +53,16 @@ class ProductAttributeValue extends DataObject
         }
         $attribute = $this->Attribute();
 
-        return match ($attribute->Type) {
-            self::PIM_CATALOG_SIMPLESELECT_TYPE => $attribute->Options()->filter('Code', $value)->first()->Name,
-            self::PIM_CATALOG_MULTISELECT_TYPE => DBField::create_field('HTMLText', AttributeParser::MultiSelectParser($this)),
-            self::PIM_CATALOG_PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
-            self::PIM_CATALOG_FILE_TYPE, self::PIM_CATALOG_IMAGE_TYPE => ProductMediaFile::get()->find('Code', $value)?->getAttributeValue(),
-            self::PIM_CATALOG_DATE => DBDatetime::create()->setValue($value)->Nice(),
-            self::PIM_CATALOG_TEXTAREA_TYPE => DBField::create_field('HTMLText', $this->getField('TextValue')),
-            self::PIM_CATALOG_METRIC_TYPE => DBField::create_field('HTMLText', AttributeParser::MetricTypeParser($this)),
-            self::PIM_CATALOG_BOOLEAN_TYPE => (bool)$value ? _t(__CLASS__.'.Yes', 'Yes') : _t(__CLASS__.'.No', 'No'),
+        return match (ProductAttributeType::tryFrom($attribute->Type)) {
+            ProductAttributeType::BOOLEAN => (bool) $value ? _t(__CLASS__.'.Yes', 'Yes') : _t(__CLASS__.'.No', 'No'),
+            ProductAttributeType::DATE => DBDatetime::create()->setValue($value)->Nice(),
+            ProductAttributeType::FILE, ProductAttributeType::IMAGE => ProductMediaFile::get()->find('Code', $value)?->getAttributeValue(),
+            ProductAttributeType::METRIC => DBField::create_field('HTMLText', AttributeParser::MetricTypeParser($this)),
+            ProductAttributeType::MULTISELECT => DBField::create_field('HTMLText', AttributeParser::MultiSelectParser($this)),
+            ProductAttributeType::PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
+            ProductAttributeType::SIMPLESELECT => $attribute->Options()->filter('Code', $value)->first()->Name,
+            ProductAttributeType::TEXT => DBField::create_field('HTMLText', strval($value)),
+            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', nl2br($this->getField('TextValue'))),
             default => strval($value),
         };
     }
@@ -81,10 +73,10 @@ class ProductAttributeValue extends DataObject
 
         $attribute = $this->Attribute();
 
-        if ($attribute->Type === self::PIM_CATALOG_FILE_TYPE) {
+        if ($attribute->Type === ProductAttributeType::FILE) {
             $file = File::get()->byID($this->Value);
             $file?->delete();
-        } elseif ($attribute->Type === self::PIM_CATALOG_IMAGE_TYPE) {
+        } elseif ($attribute->Type === ProductAttributeType::IMAGE) {
             $image = Image::get()->byID($this->Value);
             $image?->delete();
         }

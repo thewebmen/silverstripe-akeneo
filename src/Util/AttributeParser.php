@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WeDevelop\Akeneo\Util;
 
+use WeDevelop\Akeneo\Enums\ProductAttributeType;
 use WeDevelop\Akeneo\Models\ProductAttributeOption;
 use WeDevelop\Akeneo\Models\ProductAttributeValue;
 
@@ -11,7 +12,7 @@ abstract class AttributeParser
 {
     public static function MetricTypeParser(ProductAttributeValue $value): ?string
     {
-        if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_METRIC_TYPE) {
+        if (ProductAttributeType::tryFrom($value->Attribute()->Type) !== ProductAttributeType::METRIC) {
             throw new \RuntimeException('Not a metric attribute value');
         }
 
@@ -34,7 +35,7 @@ abstract class AttributeParser
 
     public static function MultiSelectParser(ProductAttributeValue $value): string
     {
-        if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_MULTISELECT_TYPE) {
+        if (ProductAttributeType::tryFrom($value->Attribute()->Type) !== ProductAttributeType::MULTISELECT) {
             throw new \RuntimeException('Not a multi select attribute value');
         }
 
@@ -52,7 +53,7 @@ abstract class AttributeParser
 
     public static function PriceCollectionParser(ProductAttributeValue $value): string
     {
-        if ($value->Attribute()->Type !== ProductAttributeValue::PIM_CATALOG_PRICE_COLLECTION) {
+        if (ProductAttributeType::tryFrom($value->Attribute()->Type) !== ProductAttributeType::PRICE_COLLECTION) {
             throw new \RuntimeException('Not a price collection attribute value');
         }
 

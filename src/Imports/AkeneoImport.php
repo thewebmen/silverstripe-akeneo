@@ -5,6 +5,7 @@ namespace WeDevelop\Akeneo\Imports;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ValidationException;
+use WeDevelop\Akeneo\Enums\ProductAttributeType;
 use WeDevelop\Akeneo\Models\AkeneoImportInterface;
 use WeDevelop\Akeneo\Models\Family;
 use WeDevelop\Akeneo\Models\FamilyVariant;
@@ -340,7 +341,7 @@ class AkeneoImport
                 $attributeValue->AttributeID = $attribute->ID;
                 $attributeValue->LocaleID = $locale?->ID;
 
-                if ($attribute->Type === ProductAttributeValue::PIM_CATALOG_TEXTAREA_TYPE) {
+                if (in_array($attribute->Type, [ProductAttributeType::TEXT, ProductAttributeType::TEXTAREA])) {
                     $attributeValue->TextValue = $value['data'];
                 } else {
                     $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
