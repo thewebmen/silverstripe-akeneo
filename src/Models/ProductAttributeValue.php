@@ -62,7 +62,7 @@ class ProductAttributeValue extends DataObject
             ProductAttributeType::PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
             ProductAttributeType::SIMPLESELECT => $attribute->Options()->filter('Code', $value)->first()->Name,
             ProductAttributeType::TEXT => DBField::create_field('HTMLText', strval($value)),
-            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', nl2br($this->getField('TextValue'))),
+            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', nl2br($this->getField('TextValue') ?? $value)),
             default => strval($value),
         };
     }
