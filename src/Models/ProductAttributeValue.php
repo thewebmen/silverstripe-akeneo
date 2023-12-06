@@ -71,14 +71,13 @@ class ProductAttributeValue extends DataObject
     {
         parent::onAfterDelete();
 
-        $attribute = $this->Attribute();
-
-        if ($attribute->Type === ProductAttributeType::FILE) {
-            $file = File::get()->byID($this->Value);
-            $file?->delete();
-        } elseif ($attribute->Type === ProductAttributeType::IMAGE) {
-            $image = Image::get()->byID($this->Value);
-            $image?->delete();
+        switch(ProductAttributeType::tryFrom($this->Attribute()->Type)) {
+            case ProductAttributeType::FILE:
+                File::get()->byID($this->Value)?->delete();
+                break;
+            case ProductAttributeType::IMAGE:
+                Image::get()->byID($this->Value)?->delete();
+                break;
         }
     }
 
