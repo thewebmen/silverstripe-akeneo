@@ -341,7 +341,7 @@ class AkeneoImport
                 $attributeValue->AttributeID = $attribute->ID;
                 $attributeValue->LocaleID = $locale?->ID;
 
-                if (in_array($attribute->Type, [ProductAttributeType::TEXT, ProductAttributeType::TEXTAREA])) {
+                if (in_array(ProductAttributeType::tryFrom($attribute->Type), [ProductAttributeType::TEXT, ProductAttributeType::TEXTAREA])) {
                     $attributeValue->TextValue = $value['data'];
                 } else {
                     $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
