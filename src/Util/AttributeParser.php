@@ -45,7 +45,7 @@ abstract class AttributeParser
         }
 
         try {
-            $parsedJSON = json_decode($jsonValues);
+            $parsedJSON = json_decode($jsonValues, true, 512, JSON_THROW_ON_ERROR);
         } catch (\Exception) {
             return '';
         }
