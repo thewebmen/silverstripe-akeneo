@@ -41,12 +41,18 @@ abstract class AttributeParser
 
         $jsonValues = $value->getField('Value');
         if (empty($jsonValues)) {
-            return null;
+            return '';
+        }
+
+        try {
+            $parsedJSON = json_decode($jsonValues, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Exception) {
+            return '';
         }
 
         $attributeNames = array_map(static function (ProductAttributeOption $option) {
             return $option->getName();
-        }, $value->Attribute()->Options()->filter('Code', $jsonValues)->toArray());
+        }, $value->Attribute()->Options()->filter('Code', $parsedJSON)->toArray());
 
         return implode(', ', $attributeNames);
     }
