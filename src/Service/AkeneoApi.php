@@ -10,17 +10,24 @@ use SilverStripe\SiteConfig\SiteConfig;
 class AkeneoApi
 {
     private const URI = 'api/rest/v1/';
+
     private const TOKEN_URI = 'api/oauth/v1/';
 
-    private string $host;
-    private string $clientId;
-    private string $secret;
-    private string $username;
-    private string $password;
+    private readonly string $host;
+
+    private readonly string $clientId;
+
+    private readonly string $secret;
+
+    private readonly string $username;
+
+    private readonly string $password;
+
     private ?string $channel;
 
-    private Client $apiClient;
-    private Client $tokenClient;
+    private readonly Client $apiClient;
+
+    private readonly Client $tokenClient;
 
     private ?Token $token = null;
 
@@ -169,7 +176,7 @@ class AkeneoApi
      */
     private function request(string $uri, array $options = [], bool $withCount = true)
     {
-        if (!$this->token) {
+        if (!$this->token instanceof \WeDevelop\Akeneo\Service\Token) {
             $this->authorize();
         }
 
@@ -180,9 +187,9 @@ class AkeneoApi
 
         try {
             $response = $this->apiClient->get($uri, $options);
-        } catch (\Exception $e) {
-            Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-            throw $e;
+        } catch (\Exception $exception) {
+            Injector::inst()->get(LoggerInterface::class)->error($exception->getMessage());
+            throw $exception;
         }
 
         if ($response->getHeader('Content-Type')[0] !== 'application/json') {
@@ -191,9 +198,9 @@ class AkeneoApi
 
         try {
             $responseData = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Exception $e) {
-            Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-            throw $e;
+        } catch (\Exception $exception) {
+            Injector::inst()->get(LoggerInterface::class)->error($exception->getMessage());
+            throw $exception;
         }
 
         return $responseData;
@@ -218,9 +225,9 @@ class AkeneoApi
                 'auth' => $auth,
                 'body' => json_encode($body),
             ]);
-        } catch (\Exception $e) {
-            Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-            throw $e;
+        } catch (\Exception $exception) {
+            Injector::inst()->get(LoggerInterface::class)->error($exception->getMessage());
+            throw $exception;
         }
 
         return Token::createFromResponse($response);
@@ -244,9 +251,9 @@ class AkeneoApi
                 'auth' => $auth,
                 'body' => json_encode($body),
             ]);
-        } catch (\Exception $e) {
-            Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-            throw $e;
+        } catch (\Exception $exception) {
+            Injector::inst()->get(LoggerInterface::class)->error($exception->getMessage());
+            throw $exception;
         }
 
         return Token::createFromResponse($response);

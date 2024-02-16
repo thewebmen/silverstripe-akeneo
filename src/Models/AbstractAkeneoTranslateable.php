@@ -3,21 +3,23 @@
 namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\NullHTTPRequest;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 
 /**
- * @method HasManyList<LabelTranslation> LabelTranslations
- * @property string Code
+ * @method HasManyList<LabelTranslation> LabelTranslations()
  */
 class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslateableInterface
 {
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_many = [
         'LabelTranslations' => LabelTranslation::class,
     ];
-
 
     public function getTitle(): string
     {
@@ -50,11 +52,14 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
         }
 
         foreach (array_keys($akeneoItem['labels']) as $locale) {
-            $label = $this->LabelTranslations()->find('Locale.Code', $locale) ?? new LabelTranslation();
+            /** @var LabelTranslation|null $label */
+            $label = $this->LabelTranslations()->find('Locale.Code', $locale);
+            $label ??= LabelTranslation::create();
+            /** @var Locale|null $localeModel */
             $localeModel = Locale::get()->find('Code', $locale);
 
-            if (!$localeModel) {
-                $localeModel = new Locale();
+            if ($localeModel === null) {
+                $localeModel = Locale::create();
                 $localeModel->Code = $locale;
                 $localeModel->write();
             }
@@ -67,15 +72,13 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
 
     public function getLocaleFromRequest(): string
     {
-        $controller = Controller::curr();
-
-        if (!$controller) {
+        if (!Controller::has_curr()) {
             return i18n::get_locale();
         }
 
-        $request = $controller->getRequest();
+        $request = Controller::curr()->getRequest();
 
-        if (!$request) {
+        if ($request instanceof NullHTTPRequest) {
             return i18n::get_locale();
         }
 

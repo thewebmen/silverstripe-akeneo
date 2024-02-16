@@ -2,31 +2,42 @@
 
 namespace WeDevelop\Akeneo\Models;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 
 /**
- * @property string $Label
+ * @property ?string $Label
  */
 class LabelTranslation extends DataObject
 {
     /** @config */
     private static string $table_name = 'Akeneo_Label_Translations';
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $db = [
         'Label' => 'Varchar',
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $summary_fields = [
-        'ID',
-        'Label',
+        'ID' => 'ID',
+        'Label' => 'Label',
         'Locale.Code' => 'Locale',
     ];
 
+    /** @config */
     private static string $default_sort = 'Label';
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_one = [
         'Locale' => Locale::class,
         'Family' => Family::class,
@@ -41,7 +52,7 @@ class LabelTranslation extends DataObject
         'ProductImage' => ProductImage::class,
     ];
 
-    public function getCMSFields()
+    public function getCMSFields(): FieldList
     {
         $fields = parent::getCMSFields();
 

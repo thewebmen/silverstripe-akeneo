@@ -1,0 +1,26 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to method delete\\(\\) on an unknown class WeDevelop\\\\Akeneo\\\\Models\\\\ProductAssociation\\.ProductModel\\.$#"
+			count: 1
+			path: src/Imports/AkeneoImport.php
+
+		-
+			message: "#^Access to property \\$Type on an unknown class WeDevelop\\\\Akeneo\\\\Models\\\\ProductAssociation\\.Product\\.$#"
+			count: 2
+			path: src/Models/Product.php
+
+		-
+			message: "#^Call to method RelatedProduct\\(\\) on an unknown class WeDevelop\\\\Akeneo\\\\Models\\\\ProductAssociation\\.Product\\.$#"
+			count: 3
+			path: src/Models/Product.php
+
+		-
+			message: "#^Using nullsafe method call on non\\-nullable type WeDevelop\\\\Akeneo\\\\Models\\\\ProductMediaFile\\. Use \\-\\> instead\\.$#"
+			count: 1
+			path: src/Models/ProductAttributeValue.php
+
+		-
+			message: "#^Method WeDevelop\\\\Akeneo\\\\Service\\\\AkeneoApi\\:\\:refreshToken\\(\\) is unused\\.$#"
+			count: 1
+			path: src/Service/AkeneoApi.php

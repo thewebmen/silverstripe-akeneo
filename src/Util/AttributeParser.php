@@ -22,14 +22,14 @@ abstract class AttributeParser
         }
 
         /** @var array{amount: string, unit: string}|mixed $decodedValue */
-        $decodedValue = json_decode($jsonValue, true);
+        $decodedValue = json_decode((string)$jsonValue, true);
         if (!is_array($decodedValue)) {
             return null;
         }
 
         return vsprintf('%s %s', [
-            round(floatval($decodedValue['amount']), 2),
-            _t(__CLASS__ . '.' . strtoupper($decodedValue['unit']), ucfirst(strtolower($decodedValue['unit']))),
+            round((float)$decodedValue['amount'], 2),
+            _t(self::class . '.' . strtoupper((string)$decodedValue['unit']), ucfirst(strtolower((string)$decodedValue['unit']))),
         ]);
     }
 
@@ -45,14 +45,12 @@ abstract class AttributeParser
         }
 
         try {
-            $parsedJSON = json_decode($jsonValues, true, 512, JSON_THROW_ON_ERROR);
+            $parsedJSON = json_decode((string)$jsonValues, true, 512, JSON_THROW_ON_ERROR);
         } catch (\Exception) {
             return '';
         }
 
-        $attributeNames = array_map(static function (ProductAttributeOption $option) {
-            return $option->getName();
-        }, $value->Attribute()->Options()->filter('Code', $parsedJSON)->toArray());
+        $attributeNames = array_map(static fn (ProductAttributeOption $option) => $option->getName(), $value->Attribute()->Options()->filter('Code', $parsedJSON)->toArray());
 
         return implode(', ', $attributeNames);
     }
@@ -63,10 +61,10 @@ abstract class AttributeParser
             throw new \RuntimeException('Not a price collection attribute value');
         }
 
-        /** @var array<array{amount: string, currency: string}>|mixed $decodedValue */
+        /** @var array<array{amount: string, currency: string}>|mixed $jsonValue */
         $jsonValue = $value->getField('Value');
         if (!is_array($jsonValue) || empty($jsonValue[0])) {
-            return null;
+            return '';
         }
 
         return $jsonValue[0]['currency'] . ' ' . $jsonValue[0]['amount'];

@@ -4,6 +4,9 @@ namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Security\Member;
 
+/**
+ * @property ?string $Type
+ */
 class ProductAssociation extends AbstractAkeneoTranslateable
 {
     /** @config */
