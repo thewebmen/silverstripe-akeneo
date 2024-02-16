@@ -54,11 +54,12 @@ class AkeneoImport
     private array $productMediaFiles = [];
 
     private array $productModelsAssociations = [];
+
     private array $productsAssociations = [];
 
     private bool $verbose = true;
 
-    private AkeneoApi $akeneoApi;
+    private readonly AkeneoApi $akeneoApi;
 
     /**
      * @var array<string, array{class: class-string, identifierField: string, relatedField: string}>
@@ -130,7 +131,7 @@ class AkeneoImport
     public function run(array $imports): void
     {
         foreach (array_keys($this->imports) as $type) {
-            if (!empty($imports) && !in_array($type, $imports, true) && !$this->isRequiredParentImport($type, $imports)) {
+            if ($imports !== [] && !in_array($type, $imports, true) && !$this->isRequiredParentImport($type, $imports)) {
                 continue;
             }
 
@@ -167,7 +168,7 @@ class AkeneoImport
 
     protected function import(string $type, ?string $parentImport = null, ?string $parentImportKey = null): void
     {
-        $this->output("Import " . $type . ($parentImportKey ? " of {$parentImportKey}" : ''));
+        $this->output("Import " . $type . ($parentImportKey ? ' of ' . $parentImportKey : ''));
         $class = $this->imports[$type];
 
         if ($parentImport && $parentImportKey) {
@@ -180,7 +181,7 @@ class AkeneoImport
         $limit = 50;
 
         do {
-            $page++;
+            ++$page;
             $apiMethod = 'get' . ucfirst($type);
 
             $akeneoData = $this->akeneoApi->$apiMethod($page, $limit, $parentImportKey);
@@ -188,7 +189,7 @@ class AkeneoImport
 
             foreach ($akeneoData['_embedded']['items'] as $akeneoItem) {
                 if ($this->shouldSkip($type, $akeneoItem)) {
-                    $this->output("Skipping {$akeneoItem['code']}");
+                    $this->output('Skipping ' . $akeneoItem['code']);
                     continue;
                 }
 
@@ -233,13 +234,13 @@ class AkeneoImport
 
     protected function setAssociations(): void
     {
-        if (!empty($this->productModelsAssociations)) {
+        if ($this->productModelsAssociations !== []) {
             foreach (ProductModel::get() as $productModel) {
                 $this->setProductAssociations($productModel, $this->productModelsAssociations[$productModel->Code]);
             }
         }
 
-        if (!empty($this->productsAssociations)) {
+        if ($this->productsAssociations !== []) {
             foreach (Product::get() as $product) {
                 $this->setProductAssociations($product, $this->productsAssociations[$product->SKU]);
             }
@@ -303,11 +304,7 @@ class AkeneoImport
 
     protected function shouldSkip(string $type, $akeneoItem): bool
     {
-        if ($type === 'categories' && $akeneoItem['parent'] && !array_key_exists($akeneoItem['parent'], $this->categories)) {
-            return true;
-        }
-
-        return false;
+        return $type === 'categories' && $akeneoItem['parent'] && !array_key_exists($akeneoItem['parent'], $this->categories);
     }
 
     protected function prepareImport(string $type, string $class): void
@@ -350,13 +347,13 @@ class AkeneoImport
                 $akeneoLocale = $value['locale'] ?? null;
                 /** @var  Locale|null $locale */
                 $locale = Locale::get()->find('Code', $akeneoLocale);
-                
+
                 /** @var  ProductAttributeValue|null $attributeValue */
                 $attributeValue = $productInstance->AttributeValues()->filter([
                     'AttributeID' => $attribute->ID,
                     'LocaleID' => $locale->ID ?? 0,
                 ])->first();
-                $attributeValue ??= new ProductAttributeValue();
+                $attributeValue ??= ProductAttributeValue::create();
 
                 $attributeValue->AttributeID = $attribute->ID;
                 $attributeValue->LocaleID = $locale?->ID;
@@ -366,6 +363,7 @@ class AkeneoImport
                 } else {
                     $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
                 }
+
                 $productInstance->AttributeValues()->add($attributeValue);
             }
         }
@@ -392,7 +390,7 @@ class AkeneoImport
                 $relatedField = $this->associationMapping[$relatedType]['relatedField'];
 
                 foreach ($relatedObjectKeys as $relatedObjectKey) {
-                    $association = new ProductAssociation();
+                    $association = ProductAssociation::create();
                     $association->Type = $associationType;
                     if ($productInstance instanceof ProductModel) {
                         $association->ProductModelID = $productInstance->ID;
@@ -422,7 +420,7 @@ class AkeneoImport
         $limit = 50;
 
         do {
-            $page++;
+            ++$page;
 
             $mediaFiles = $this->akeneoApi->getMediaFiles($page, $limit);
             $itemsCount = $mediaFiles['items_count'];
@@ -433,6 +431,7 @@ class AkeneoImport
                     unset($this->productMediaFiles[$mediaFile['code']]);
                     continue;
                 }
+
                 $this->saveMediaFile($mediaFile);
             }
         } while ($page * $limit < $itemsCount);

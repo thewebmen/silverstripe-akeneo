@@ -29,7 +29,7 @@ class ProductImage extends Image
     public static function createFromAkeneoData(array $data, string $content): self
     {
         $productImage = new self();
-        $productImage->setFromString($content, sprintf('%s_%s', base64_encode($data['code']), $data['original_filename']));
+        $productImage->setFromString($content, sprintf('%s_%s', base64_encode((string)$data['code']), $data['original_filename']));
 
         $productImage->Code = $data['code'];
         $productImage->Title = $data['original_filename'];

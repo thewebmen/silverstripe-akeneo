@@ -48,17 +48,17 @@ class AkeneoSiteConfigExtension extends DataExtension
      */
     public function onBeforeWrite()
     {
-        $this->owner->AkeneoURL = rtrim($this->owner->AkeneoURL ?? '', '/ ');
+        $this->getOwner()->AkeneoURL = rtrim($this->getOwner()->AkeneoURL ?? '', '/ ');
         parent::onBeforeWrite();
     }
 
     private function credentialsExist(): bool
     {
-        return $this->owner->AkeneoURL &&
-            $this->owner->AkeneoClientID &&
-            $this->owner->AkeneoSecret &&
-            $this->owner->AkeneoUsername &&
-            $this->owner->AkeneoPassword;
+        return $this->getOwner()->AkeneoURL &&
+            $this->getOwner()->AkeneoClientID &&
+            $this->getOwner()->AkeneoSecret &&
+            $this->getOwner()->AkeneoUsername &&
+            $this->getOwner()->AkeneoPassword;
     }
 
     private function canConnect(): bool
@@ -71,7 +71,7 @@ class AkeneoSiteConfigExtension extends DataExtension
 
         try {
             $this->akeneoApi->authorize();
-        } catch (ClientException $e) {
+        } catch (ClientException) {
             return false;
         }
 

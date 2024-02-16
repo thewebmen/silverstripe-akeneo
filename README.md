@@ -4,7 +4,7 @@ This module adds import Akeneo data to Silverstripe enviroment
 
 # Requirements
 * SilverStripe ^4.11
-* PHP ^8.0
+* PHP ^8.1
 
 # Installation
  - `composer require "wedevelopnl/silverstripe-akeneo"`

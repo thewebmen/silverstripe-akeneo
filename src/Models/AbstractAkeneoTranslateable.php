@@ -54,12 +54,12 @@ class AbstractAkeneoTranslateable extends DataObject implements AkeneoTranslatea
         foreach (array_keys($akeneoItem['labels']) as $locale) {
             /** @var LabelTranslation|null $label */
             $label = $this->LabelTranslations()->find('Locale.Code', $locale);
-            $label ??= new LabelTranslation();
+            $label ??= LabelTranslation::create();
             /** @var Locale|null $localeModel */
             $localeModel = Locale::get()->find('Code', $locale);
 
-            if (!$localeModel) {
-                $localeModel = new Locale();
+            if ($localeModel === null) {
+                $localeModel = Locale::create();
                 $localeModel->Code = $locale;
                 $localeModel->write();
             }

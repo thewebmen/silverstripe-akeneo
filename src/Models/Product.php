@@ -90,7 +90,7 @@ class Product extends DataObject implements AkeneoImportInterface
         if (Controller::has_curr()) {
             return i18n::get_locale();
         }
-        
+
         $request = Controller::curr()->getRequest();
 
         if ($request instanceof NullHTTPRequest) {
@@ -115,7 +115,10 @@ class Product extends DataObject implements AkeneoImportInterface
             $fields->makeFieldReadonly($field);
         }
 
-        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create()));
+        $fields->addFieldToTab(
+            'Root.AttributeValues',
+            GridField::create('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create())
+        );
 
         return $fields;
     }

@@ -51,7 +51,10 @@ class ProductAttributeGroup extends AbstractAkeneoTranslateable implements Akene
         }
 
         if ($this->Attributes()->count() > 0) {
-            $fields->addFieldToTab('Root.Options', new GridField('Attributes', 'Attributes', $this->Attributes(), GridFieldConfig_RecordEditor::create()));
+            $fields->addFieldToTab(
+                'Root.Options',
+                GridField::create('Attributes', 'Attributes', $this->Attributes(), GridFieldConfig_RecordEditor::create())
+            );
         }
 
         return $fields;

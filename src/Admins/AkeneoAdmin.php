@@ -47,10 +47,8 @@ class AkeneoAdmin extends ModelAdmin
     {
         $form = parent::getEditForm($id, $fields);
 
-        if ($this->modelClass === ProductCategory::class && $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
-            if ($gridField instanceof GridField) {
-                $gridField->getConfig()->addComponent(new GridFieldOrderableRows('Sort'));
-            }
+        if ($this->modelClass === ProductCategory::class && ($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) && $gridField instanceof GridField) {
+            $gridField->getConfig()->addComponent(GridFieldOrderableRows::create('Sort'));
         }
 
         if ($this->modelClass === DisplayGroup::class && $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
@@ -107,8 +105,8 @@ class AkeneoAdmin extends ModelAdmin
     {
         try {
             $importMessage = self::asyncImport();
-        } catch (\Exception $e) {
-            $importMessage = $e->getMessage();
+        } catch (\Exception $exception) {
+            $importMessage = $exception->getMessage();
         }
 
         Controller::curr()->getResponse()->addHeader('X-Status', $importMessage);
@@ -139,7 +137,7 @@ class AkeneoAdmin extends ModelAdmin
 
         $editFormField = 'EditForm/field/';
 
-        if ($subTab) {
+        if ($subTab !== '' && $subTab !== '0') {
             $editFormField .= $subTab . '/';
         }
 

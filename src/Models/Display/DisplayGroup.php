@@ -71,6 +71,7 @@ class DisplayGroup extends DataObject
     ];
 
     private const RECURSION_MAX_DEPTH = 20;
+
     private static int $RECURSION_COUNTER = 0;
 
     public function getCMSFields(): FieldList
@@ -168,14 +169,12 @@ class DisplayGroup extends DataObject
                 break;
             }
 
-            self::$RECURSION_COUNTER++;
+            ++self::$RECURSION_COUNTER;
 
             $html .= sprintf('<li>%s</li>', $DisplayGroup->getHierarchyHTML());
         }
 
-        $html .= '</ul>';
-
-        return $html;
+        return $html . '</ul>';
     }
 
     private function getHierarchyLiteralField(): LiteralField
@@ -197,7 +196,7 @@ class DisplayGroup extends DataObject
         ]);
     }
 
-    public function onBeforeWrite()
+    protected function onBeforeWrite()
     {
         $this->IsRootGroup = $this->ParentDisplayGroups()->count() === 0;
 

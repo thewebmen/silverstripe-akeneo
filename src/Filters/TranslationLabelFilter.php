@@ -10,11 +10,11 @@ use WeDevelop\Akeneo\Models\ProductAttribute;
 
 class TranslationLabelFilter extends SearchFilter
 {
-    public function applyOne(DataQuery $query): DataQuery
+    protected function applyOne(DataQuery $query): DataQuery
     {
         $value = $this->getValue();
 
-        $query = call_user_func([ProductAttribute::class, 'filterByLabel'], $query, $value);
+        $query = call_user_func(ProductAttribute::filterByLabel(...), $query, $value);
 
         return $query;
     }
