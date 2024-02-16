@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeDevelop\Akeneo\Filters;
 
 use SilverStripe\ORM\DataQuery;
@@ -8,7 +10,7 @@ use WeDevelop\Akeneo\Models\ProductAttribute;
 
 class TranslationLabelFilter extends SearchFilter
 {
-    public function applyOne(DataQuery $query)
+    public function applyOne(DataQuery $query): DataQuery
     {
         $value = $this->getValue();
 
@@ -19,6 +21,6 @@ class TranslationLabelFilter extends SearchFilter
 
     protected function excludeOne(DataQuery $query)
     {
-        // TODO: Implement excludeOne() method.
+        throw new \RuntimeException('Not implemented yet.');
     }
 }

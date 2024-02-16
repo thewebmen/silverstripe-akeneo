@@ -26,31 +26,31 @@ class AkeneoImport
     use Injectable;
     use Configurable;
 
-    /** @var array<string,ProductCategory> */
+    /** @var array<string, ProductCategory> */
     private array $categories = [];
 
-    /** @var array<string,ProductAttribute> */
+    /** @var array<string, ProductAttribute> */
     private array $attributes = [];
 
-    /** @var array<string,ProductAttributeGroup> */
+    /** @var array<string, ProductAttributeGroup> */
     private array $attributeGroups = [];
 
-    /** @var array<string,ProductAttributeOption> */
+    /** @var array<string, ProductAttributeOption> */
     private array $attributesOptions = [];
 
-    /** @var array<string,Family> */
+    /** @var array<string, Family> */
     private array $families = [];
 
-    /** @var array<string,FamilyVariant> */
+    /** @var array<string, FamilyVariant> */
     private array $variants = [];
 
-    /** @var array<string,ProductModel> */
+    /** @var array<string, ProductModel> */
     private array $productModels = [];
 
-    /** @var array<string,Product> */
+    /** @var array<string, Product> */
     private array $products = [];
 
-    /** @var array<string,ProductMediaFile> */
+    /** @var array<string, ProductMediaFile> */
     private array $productMediaFiles = [];
 
     private array $productModelsAssociations = [];
@@ -60,6 +60,9 @@ class AkeneoImport
 
     private AkeneoApi $akeneoApi;
 
+    /**
+     * @var array<string, array{class: class-string, identifierField: string, relatedField: string}>
+     */
     private array $associationMapping = [
         'products' => [
             'class' => Product::class,
@@ -73,6 +76,9 @@ class AkeneoImport
         ],
     ];
 
+    /**
+     * @var array<string, class-string>
+     */
     private array $imports = [
         'categories' => ProductCategory::class,
         'attributeGroups' => ProductAttributeGroup::class,
@@ -84,6 +90,9 @@ class AkeneoImport
         'products' => Product::class,
     ];
 
+    /**
+     * @var array<string, array{class: class-string, filter: array<string, array<string>>}>
+     */
     private array $importParents = [
         'attributeOptions' => [
             'class' => ProductAttribute::class,
@@ -98,6 +107,9 @@ class AkeneoImport
         ],
     ];
 
+    /**
+     * @var array<string, string>
+     */
     private array $requiredParentImport = [
         'attributes' => 'attributeOptions',
         'families' => 'variants',
@@ -261,6 +273,7 @@ class AkeneoImport
 
             if ($type === 'productModels') {
                 $variantCode = $akeneoItem['family_variant'];
+                /** @var FamilyVariant|null $variant */
                 $variant = FamilyVariant::get()->filter([
                     'Code' => $variantCode,
                     'Family.Code' => $familyCode,
@@ -269,6 +282,7 @@ class AkeneoImport
                     'FamilyVariantID' => $variant?->ID,
                 ];
             } else {
+                /** @var Family|null $family */
                 $family = Family::get()->find('Code', $familyCode);
                 $ids = [
                     'FamilyID' => $family?->ID,
@@ -276,6 +290,7 @@ class AkeneoImport
             }
 
             if ($parentCode) {
+                /** @var ProductModel|null $parent */
                 $parent = ProductModel::get()->find('Code', $parentCode);
                 $ids['ProductModelID'] = $parent?->ID;
             }
@@ -320,28 +335,33 @@ class AkeneoImport
 
     protected function setProductAttributes(AkeneoImportInterface $productInstance, array $attributeValues): void
     {
+        if (!$productInstance instanceof ProductModel && !$productInstance instanceof Product) {
+            return;
+        }
+
         foreach ($attributeValues as $attributeCode => $values) {
+            /** @var ProductAttribute|null $attribute */
             $attribute = ProductAttribute::get()->find('Code', $attributeCode);
-            if (!$attribute) {
+            if ($attribute === null) {
                 continue;
             }
 
-            /** @var  ProductModel|Product $productInstance */
             foreach ($values as $value) {
                 $akeneoLocale = $value['locale'] ?? null;
+                /** @var  Locale|null $locale */
                 $locale = Locale::get()->find('Code', $akeneoLocale);
-
+                
+                /** @var  ProductAttributeValue|null $attributeValue */
                 $attributeValue = $productInstance->AttributeValues()->filter([
                     'AttributeID' => $attribute->ID,
                     'LocaleID' => $locale->ID ?? 0,
                 ])->first();
-
-                $attributeValue = $attributeValue ?: new ProductAttributeValue();
+                $attributeValue ??= new ProductAttributeValue();
 
                 $attributeValue->AttributeID = $attribute->ID;
                 $attributeValue->LocaleID = $locale?->ID;
 
-                if (in_array(ProductAttributeType::tryFrom($attribute->Type), [ProductAttributeType::TEXT, ProductAttributeType::TEXTAREA])) {
+                if (in_array(ProductAttributeType::tryFrom($attribute->Type), [ProductAttributeType::TEXT, ProductAttributeType::TEXTAREA], true)) {
                     $attributeValue->TextValue = $value['data'];
                 } else {
                     $attributeValue->Value = is_array($value['data']) ? json_encode($value['data']) : $value['data'];
@@ -353,7 +373,10 @@ class AkeneoImport
 
     protected function setProductAssociations(AkeneoImportInterface $productInstance, array $associations): void
     {
-        /** @var  Product|ProductModel $productInstance */
+        if (!$productInstance instanceof ProductModel && !$productInstance instanceof Product) {
+            return;
+        }
+
         foreach ($productInstance->Associations() as $association) {
             $association->delete();
         }

@@ -157,6 +157,7 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
             $locale = i18n::get_locale();
         }
 
+        /** @var LabelTranslation|null $labelTranslation */
         $labelTranslation = $this->LabelTranslations()->filter('Locale.Code', $locale)->first();
 
         return $labelTranslation ? $labelTranslation->Label : '';
@@ -167,9 +168,10 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
         $labelTranslationIDs = LabelTranslation::get()->filter(['Label:PartialMatch' => $value])->column('ID');
         $query->leftJoin('Akeneo_Label_Translations', '"Akeneo_Label_Translations"."ProductAttributeID" = "Akeneo_ProductAttribute"."ID"');
 
-        $locale = \WeDevelop\Akeneo\Models\Locale::get()->filter(['code' => $locale])->first();
+        /** @var Locale|null $locale */
+        $locale = Locale::get()->filter(['code' => $locale])->first();
 
-        if (empty($labelTranslationIDs) || (!$locale)) {
+        if (empty($labelTranslationIDs) || ($locale === null)) {
             $query->where("0 = 1");
         } else {
             $idsString = implode(',', $labelTranslationIDs);
@@ -178,7 +180,7 @@ class ProductAttribute extends AbstractAkeneoTranslateable implements AkeneoImpo
 
         $query->selectField('"Akeneo_Label_Translations"."Label"', 'SearchLabel');
 
-        $query->sort([]);
+        $query->sort();
         return $query;
     }
 }

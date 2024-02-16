@@ -54,7 +54,7 @@ class ProductAttributeValue extends DataObject
         $attribute = $this->Attribute();
 
         return match (ProductAttributeType::tryFrom($attribute->Type)) {
-            ProductAttributeType::BOOLEAN => (bool) $value ? _t(__CLASS__.'.Yes', 'Yes') : _t(__CLASS__.'.No', 'No'),
+            ProductAttributeType::BOOLEAN => (bool)$value ? _t(__CLASS__.'.Yes', 'Yes') : _t(__CLASS__.'.No', 'No'),
             ProductAttributeType::DATE => DBDatetime::create()->setValue($value)->Nice(),
             ProductAttributeType::FILE, ProductAttributeType::IMAGE => ProductMediaFile::get()->find('Code', $value)?->getAttributeValue(),
             ProductAttributeType::METRIC => DBField::create_field('HTMLText', AttributeParser::MetricTypeParser($this)),
@@ -71,13 +71,14 @@ class ProductAttributeValue extends DataObject
     {
         parent::onAfterDelete();
 
-        switch(ProductAttributeType::tryFrom($this->Attribute()->Type)) {
-            case ProductAttributeType::FILE:
-                File::get()->byID($this->Value)?->delete();
-                break;
-            case ProductAttributeType::IMAGE:
-                Image::get()->byID($this->Value)?->delete();
-                break;
+        $productAttributeFile = match(ProductAttributeType::tryFrom($this->Attribute()->Type)) {
+            ProductAttributeType::FILE => File::get()->byID($this->Value),
+            ProductAttributeType::IMAGE => Image::get()->byID($this->Value),
+            default => null,
+        };
+
+        if ($productAttributeFile instanceof DataObject) {
+            $productAttributeFile->delete();
         }
     }
 

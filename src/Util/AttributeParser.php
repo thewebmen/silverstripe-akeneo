@@ -63,10 +63,10 @@ abstract class AttributeParser
             throw new \RuntimeException('Not a price collection attribute value');
         }
 
-        /** @var array<array{amount: string, currency: string}>|mixed $decodedValue */
+        /** @var array<array{amount: string, currency: string}>|mixed $jsonValue */
         $jsonValue = $value->getField('Value');
         if (!is_array($jsonValue) || empty($jsonValue[0])) {
-            return null;
+            return '';
         }
 
         return $jsonValue[0]['currency'] . ' ' . $jsonValue[0]['amount'];

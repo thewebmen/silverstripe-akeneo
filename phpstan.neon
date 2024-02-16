@@ -1,0 +1,12 @@
+parameters:
+    level: 5
+    bootstrapFiles:
+        - vendor/syntro/silverstripe-phpstan/bootstrap.php
+    scanDirectories:
+        - src
+    paths:
+        - src
+
+includes:
+    - vendor/syntro/silverstripe-phpstan/phpstan.neon
+    - phpstan-baseline.neon
