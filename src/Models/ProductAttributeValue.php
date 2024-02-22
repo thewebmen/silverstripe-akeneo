@@ -48,9 +48,13 @@ class ProductAttributeValue extends DataObject
 
     public function getValue()
     {
-        if (($value = $this->getField('Value')) === null) {
+        $value = $this->getField('Value');
+        $textValue = $this->getField('TextValue');
+
+        if ($value === null && $textValue === null) {
             return null;
         }
+
         $attribute = $this->Attribute();
 
         return match (ProductAttributeType::tryFrom($attribute->Type)) {
@@ -61,8 +65,8 @@ class ProductAttributeValue extends DataObject
             ProductAttributeType::MULTISELECT => DBField::create_field('HTMLText', AttributeParser::MultiSelectParser($this)),
             ProductAttributeType::PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
             ProductAttributeType::SIMPLESELECT => $attribute->Options()->filter('Code', $value)->first()->Name,
-            ProductAttributeType::TEXT => DBField::create_field('HTMLText', strval($value)),
-            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', nl2br($this->getField('TextValue') ?? $value)),
+            ProductAttributeType::TEXT => DBField::create_field('HTMLText', $value ? strval($value) : $textValue),
+            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', nl2br($textValue)),
             default => strval($value),
         };
     }
