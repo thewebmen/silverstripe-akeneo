@@ -9,9 +9,9 @@ use SilverStripe\Core\Injector\Injector;
 class Token
 {
     public function __construct(
-        private string $accessToken,
-        private int    $expiresIn,
-        private string $refreshToken
+        private readonly string $accessToken,
+        private readonly int    $expiresIn,
+        private readonly string $refreshToken
     ) {
     }
 
@@ -19,9 +19,9 @@ class Token
     {
         try {
             $responseData = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Exception $e) {
-            Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-            throw $e;
+        } catch (\Exception $exception) {
+            Injector::inst()->get(LoggerInterface::class)->error($exception->getMessage());
+            throw $exception;
         }
 
         return new self(

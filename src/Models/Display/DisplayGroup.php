@@ -2,6 +2,7 @@
 
 namespace WeDevelop\Akeneo\Models\Display;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
@@ -16,8 +17,8 @@ use WeDevelop\Akeneo\Models\ProductAttribute;
 
 /**
  * @property Boolean $IsRootGroup
- * @method ManyManyList|UnsavedRelationList<DisplayGroup> DisplayGroups
- * @method ManyManyList|UnsavedRelationList<DisplayGroup> ParentDisplayGroups
+ * @method ManyManyList|UnsavedRelationList<DisplayGroup> DisplayGroups()
+ * @method ManyManyList|UnsavedRelationList<DisplayGroup> ParentDisplayGroups()
  */
 class DisplayGroup extends DataObject
 {
@@ -30,19 +31,28 @@ class DisplayGroup extends DataObject
     /** @config */
     private static string $plural_name = 'Display Groups';
 
-    /** @var array<string, string> @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $db = [
         'Title' => 'Varchar',
         'IsRootGroup' => 'Boolean(0)',
     ];
 
-    /** @var array<string, string> @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $many_many = [
         'ProductAttributes' => ProductAttribute::class,
         'DisplayGroups' => DisplayGroup::class,
     ];
 
-    /** @var array<string, array<string, string>> @config */
+    /**
+     * @config
+     * @var array<string, array<string, string>>
+     */
     private static $many_many_extraFields = [
         'ProductAttributes' => [
             'SortOrder' => 'Int',
@@ -52,15 +62,19 @@ class DisplayGroup extends DataObject
         ],
     ];
 
-    /** @var array<string, string> @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $belongs_many_many = [
         'ParentDisplayGroups' => DisplayGroup::class . '.DisplayGroups',
     ];
 
     private const RECURSION_MAX_DEPTH = 20;
+
     private static int $RECURSION_COUNTER = 0;
 
-    public function getCMSFields()
+    public function getCMSFields(): FieldList
     {
         $fields = parent::getCMSFields();
 
@@ -139,12 +153,12 @@ class DisplayGroup extends DataObject
         $DisplayGroups = $this->getDisplayGroups();
 
         $html = '<ul>';
-        $html .= '<li><a href="' . $this->getCMSEditLink() . '" target="_blank">' . $this->getTitle() . '</a></li>';
+        $html .= sprintf('<li><a href="%s" target="_blank">%s</a></li>', $this->getCMSEditLink(), $this->getTitle());
         $html .= '<ol>';
 
         /** @var ProductAttribute $attribute */
         foreach ($attributes as $attribute) {
-            $html .= '<li>' . $attribute->getLabel() . '</li>';
+            $html .= sprintf('<li>%s</li>', $attribute->getLabel());
         }
 
         $html .= '</ol>';
@@ -152,23 +166,15 @@ class DisplayGroup extends DataObject
         /** @var DisplayGroup $DisplayGroup */
         foreach ($DisplayGroups as $DisplayGroup) {
             if (self::$RECURSION_COUNTER > self::RECURSION_MAX_DEPTH) {
-                $html .= '</ul>';
-
-                return $html;
+                break;
             }
 
-            self::$RECURSION_COUNTER++;
+            ++self::$RECURSION_COUNTER;
 
-            $hierarchyHTML = '<li>' . $DisplayGroup->getHierarchyHTML() . '</li>';
-
-            if ($hierarchyHTML) {
-                $html .= $hierarchyHTML;
-            }
+            $html .= sprintf('<li>%s</li>', $DisplayGroup->getHierarchyHTML());
         }
 
-        $html .= '</ul>';
-
-        return $html;
+        return $html . '</ul>';
     }
 
     private function getHierarchyLiteralField(): LiteralField
@@ -190,7 +196,7 @@ class DisplayGroup extends DataObject
         ]);
     }
 
-    public function onBeforeWrite()
+    protected function onBeforeWrite()
     {
         $this->IsRootGroup = $this->ParentDisplayGroups()->count() === 0;
 

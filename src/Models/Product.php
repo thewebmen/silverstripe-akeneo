@@ -3,6 +3,7 @@
 namespace WeDevelop\Akeneo\Models;
 
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\NullHTTPRequest;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\i18n\i18n;
@@ -29,38 +30,56 @@ class Product extends DataObject implements AkeneoImportInterface
     /** @config */
     private static string $plural_name = 'Products';
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $db = [
         'SKU' => 'Varchar(255)',
         'Enabled' => 'Boolean',
         'Updated' => 'Boolean',
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_one = [
         'Family' => Family::class,
         'ProductModel' => ProductModel::class,
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_many = [
         'AttributeValues' => ProductAttributeValue::class,
         'Associations' => ProductAssociation::class . '.Product',
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $many_many = [
         'Categories' => ProductCategory::class,
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $summary_fields = [
-        'SKU',
+        'SKU' => 'SKU',
         'Family.Name' => 'Family',
         'LabelFromAttribute' => 'Label',
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string>
+     */
     private static array $searchable_fields = [
         'ID',
         'SKU',
@@ -68,15 +87,13 @@ class Product extends DataObject implements AkeneoImportInterface
 
     public function getLocaleFromRequest(): string
     {
-        $controller = Controller::curr();
-
-        if (!$controller) {
+        if (Controller::has_curr()) {
             return i18n::get_locale();
         }
 
-        $request = $controller->getRequest();
+        $request = Controller::curr()->getRequest();
 
-        if (!$request) {
+        if ($request instanceof NullHTTPRequest) {
             return i18n::get_locale();
         }
 
@@ -98,7 +115,10 @@ class Product extends DataObject implements AkeneoImportInterface
             $fields->makeFieldReadonly($field);
         }
 
-        $fields->addFieldToTab('Root.AttributeValues', new GridField('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create()));
+        $fields->addFieldToTab(
+            'Root.AttributeValues',
+            GridField::create('AttributeValues', 'AttributeValues', $this->AttributeValues(), GridFieldConfig_RecordViewer::create())
+        );
 
         return $fields;
     }
@@ -166,7 +186,9 @@ class Product extends DataObject implements AkeneoImportInterface
     public function getLabelFromAttribute(): string
     {
         $attributeAsLabelCode = $this->Family()->AttributeAsLabel()->Code;
-        return $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode)?->getValue() ?? 'unknown';
+        /** @var ProductAttributeValue|null $attributeValue */
+        $attributeValue = $this->AttributeValues()->find('Attribute.Code', $attributeAsLabelCode);
+        return $attributeValue?->getValue() ?? 'unknown';
     }
 
     public function getLocalisedAttributeValues(?string $locale = null): DataList

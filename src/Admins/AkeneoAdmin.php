@@ -4,14 +4,14 @@ namespace WeDevelop\Akeneo\Admins;
 
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Control\Controller;
-use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
-use WeDevelop\Akeneo\Imports\AkeneoImport;
 use WeDevelop\Akeneo\Models\Display\DisplayGroup;
 use WeDevelop\Akeneo\Models\Family;
 use WeDevelop\Akeneo\Models\Product;
@@ -22,7 +22,10 @@ use WeDevelop\Config\AkeneoConfig;
 
 class AkeneoAdmin extends ModelAdmin
 {
-    /** @config */
+    /**
+     * @config
+     * @var array<class-string>
+     */
     private static array $managed_models = [
         Product::class,
         ProductModel::class,
@@ -40,31 +43,34 @@ class AkeneoAdmin extends ModelAdmin
     /** @config */
     private static string $menu_icon = 'wedevelopnl/silverstripe-akeneo:images/akeneo.png';
 
-    public function getEditForm($id = null, $fields = null)
+    public function getEditForm($id = null, $fields = null): Form
     {
         $form = parent::getEditForm($id, $fields);
 
-        if ($this->modelClass === ProductCategory::class && $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
-            if ($gridField instanceof GridField) {
-                $gridField->getConfig()->addComponent(new GridFieldOrderableRows('Sort'));
-            }
+        if ($this->modelClass === ProductCategory::class && ($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) && $gridField instanceof GridField) {
+            $gridField->getConfig()->addComponent(GridFieldOrderableRows::create('Sort'));
         }
 
         if ($this->modelClass === DisplayGroup::class && $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
             if ($gridField instanceof GridField) {
                 $originalField = clone $gridField;
 
+                /** @var DataList $gridFieldList */
+                $gridFieldList = $gridField->getList();
+                /** @var DataList $originalFieldList */
+                $originalFieldList = $originalField->getList();
+
                 $originalField->setList(
-                    $originalField->getList()->filter([
+                    $originalFieldList->filter([
                         'IsRootGroup' => 0,
-                    ])
+                    ]),
                 );
 
                 $gridField->setName('RootDisplayGroups');
                 $gridField->setList(
-                    $gridField->getList()->filter([
+                    $gridFieldList->filter([
                         'IsRootGroup' => 1,
-                    ])
+                    ]),
                 );
             }
 
@@ -76,10 +82,12 @@ class AkeneoAdmin extends ModelAdmin
                 $gridField,
             ]);
 
-            $fields->addFieldsToTab('Root.Sub Groups', [
-                HeaderField::create('SubHeader', 'Sub groups are part of a group chain, and therefore have a parent group defined somewhere.'),
-                $originalField,
-            ]);
+            if (!empty($originalField)) {
+                $fields->addFieldsToTab('Root.Sub Groups', [
+                    HeaderField::create('SubHeader', 'Sub groups are part of a group chain, and therefore have a parent group defined somewhere.'),
+                    $originalField,
+                ]);
+            }
         }
 
         $importRunning = self::isImportRunning();
@@ -96,9 +104,9 @@ class AkeneoAdmin extends ModelAdmin
     public function doSync(): void
     {
         try {
-          $importMessage = self::asyncImport();
-        } catch (\Exception $e) {
-          $importMessage = $e->getMessage();
+            $importMessage = self::asyncImport();
+        } catch (\Exception $exception) {
+            $importMessage = $exception->getMessage();
         }
 
         Controller::curr()->getResponse()->addHeader('X-Status', $importMessage);
@@ -111,7 +119,7 @@ class AkeneoAdmin extends ModelAdmin
         return (!empty($psOutput) && count($psOutput) > 2);
     }
 
-    public static function  asyncImport(): string
+    public static function asyncImport(): string
     {
         if (self::isImportRunning()) {
             throw new \Exception('An import is still running.');
@@ -129,7 +137,7 @@ class AkeneoAdmin extends ModelAdmin
 
         $editFormField = 'EditForm/field/';
 
-        if ($subTab) {
+        if ($subTab !== '' && $subTab !== '0') {
             $editFormField .= $subTab . '/';
         }
 

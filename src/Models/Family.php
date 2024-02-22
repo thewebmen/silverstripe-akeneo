@@ -19,29 +19,44 @@ class Family extends AbstractAkeneoTranslateable implements AkeneoImportInterfac
     /** @config */
     private static string $plural_name = 'Families';
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, string>
+     */
     private static array $db = [
         'Code' => 'Varchar(255)',
         'Updated' => 'Boolean',
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_one = [
         'AttributeAsLabel' => ProductAttribute::class,
         'AttributeAsImage' => ProductAttribute::class,
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $has_many = [
         'Variants' => FamilyVariant::class,
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string, class-string>
+     */
     private static array $many_many = [
         'Attributes' => ProductAttribute::class,
     ];
 
-    /** @config */
+    /**
+     * @config
+     * @var array<string>
+     */
     private static array $cascade_deletes = [
         'Variants',
     ];
@@ -57,7 +72,9 @@ class Family extends AbstractAkeneoTranslateable implements AkeneoImportInterfac
 
         $attributeAsLabelCode = $akeneoItem['attribute_as_label'];
         $attributeAsImageCode = $akeneoItem['attribute_as_image'];
+        /** @var ProductAttribute|null $attributeAsLabel */
         $attributeAsLabel = ProductAttribute::get()->find('code', $attributeAsLabelCode);
+        /** @var ProductAttribute|null $attributeAsImage */
         $attributeAsImage = ProductAttribute::get()->find('code', $attributeAsImageCode);
         $this->AttributeAsLabelID = $attributeAsLabel?->ID;
         $this->AttributeAsImageID = $attributeAsImage?->ID;
@@ -71,30 +88,25 @@ class Family extends AbstractAkeneoTranslateable implements AkeneoImportInterfac
 
     /**
      * @param Member $member
-     *
-     * @return bool
      */
-    public function canEdit($member = null)
+    public function canEdit($member = null): bool
     {
         return false;
     }
 
     /**
      * @param Member $member
-     *
-     * @return bool
      */
-    public function canDelete($member = null)
+    public function canDelete($member = null): bool
     {
         return false;
     }
 
     /**
      * @param Member $member
-     * @param array $context
-     * @return bool
+     * @param array<mixed> $context
      */
-    public function canCreate($member = null, $context = [])
+    public function canCreate($member = null, $context = []): bool
     {
         return false;
     }
