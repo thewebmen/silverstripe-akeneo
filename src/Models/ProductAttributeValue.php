@@ -65,8 +65,8 @@ class ProductAttributeValue extends DataObject
             ProductAttributeType::MULTISELECT => DBField::create_field('HTMLText', AttributeParser::MultiSelectParser($this)),
             ProductAttributeType::PRICE_COLLECTION => DBField::create_field('HTMLText', AttributeParser::PriceCollectionParser($this)),
             ProductAttributeType::SIMPLESELECT => $attribute->Options()->filter('Code', $value)->first()->Name,
-            ProductAttributeType::TEXT => DBField::create_field('HTMLText', $value ? (string)$value : $textValue),
-            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', $textValue ? nl2br($textValue) : nl2br($value)),
+            ProductAttributeType::TEXT => DBField::create_field('HTMLText', $textValue ?? ''),
+            ProductAttributeType::TEXTAREA => DBField::create_field('HTMLText', $textValue ? nl2br($textValue) : ''),
             default => (string)$value,
         };
     }
